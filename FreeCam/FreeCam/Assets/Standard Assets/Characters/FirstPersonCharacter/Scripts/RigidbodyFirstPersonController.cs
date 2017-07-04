@@ -126,7 +126,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        private void Update()
+        private void LateUpdate()
         {
             RotateView();
 
@@ -164,7 +164,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                 if (m_Jump)
                 {
-                    m_RigidBody.drag = 0f;
+                    //m_RigidBody.drag = 0f;
                     m_RigidBody.velocity = new Vector3(m_RigidBody.velocity.x, 0f, m_RigidBody.velocity.z);
                     m_RigidBody.AddForce(new Vector3(0f, movementSettings.JumpForce, 0f), ForceMode.Impulse);
                     m_Jumping = true;
@@ -177,7 +177,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else
             {
-                m_RigidBody.drag = 0f;
+               // m_RigidBody.drag = 0f;
                 if (m_PreviouslyGrounded && !m_Jumping)
                 {
                     StickToGroundHelper();
