@@ -4,11 +4,39 @@ using UnityEngine;
 
 public class SmoothDampAngle : MonoBehaviour 
 {
-	public Vector3 Angle;
-	public Vector3 smoothTime;
 	public Transform Reference;
-
+	public Vector3 Angle;
+	//public Quaternion AngleQ;
+	public Vector3 smoothTime;
+	public method MatchMethod;
+	public enum method
+	{
+		EulerAngles,
+		Slerp
+	}
+		
 	void LateUpdate () 
+	{
+		switch (MatchMethod) 
+		{
+		case method.EulerAngles:
+			OriginalMethod ();
+			break;
+		case method.Slerp:
+			NewMethod ();
+			break;
+		}
+	}
+
+	void NewMethod ()
+	{
+		transform.rotation = Quaternion.Slerp
+			(
+			transform.rotation, Reference.transform.rotation, smoothTime.x * Time.deltaTime
+			);
+	}
+
+	void OriginalMethod ()
 	{
 		Angle = new Vector3 
 			(
@@ -17,6 +45,6 @@ public class SmoothDampAngle : MonoBehaviour
 				Mathf.LerpAngle (transform.eulerAngles.z, Reference.eulerAngles.z, smoothTime.z * Time.deltaTime)
 			);
 
-		transform.rotation = Quaternion.Euler(Angle);
+		transform.eulerAngles = Angle;
 	}
 }

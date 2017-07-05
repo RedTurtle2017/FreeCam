@@ -9,7 +9,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
     {
         public float XSensitivity = 2f;
         public float YSensitivity = 2f;
-        public bool clampVerticalRotation = true;
+        public bool clampVerticallocalRotation = true;
         public float MinimumX = -90F;
         public float MaximumX = 90F;
         public bool smooth;
@@ -22,8 +22,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public void Init(Transform character, Transform camera)
         {
-            m_CharacterTargetRot = character.rotation;
-			//m_CameraTargetRot = camera.rotation;
+            m_CharacterTargetRot = character.localRotation;
+			//m_CameraTargetRot = camera.localRotation;
         }
 			
         public void LookRotation(Transform character, Transform camera)
@@ -31,36 +31,38 @@ namespace UnityStandardAssets.Characters.FirstPerson
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
             float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
 
+
+
 			m_CharacterTargetRot *= Quaternion.Euler (-xRot, yRot, 0f);
 			//m_CameraTargetRot *= Quaternion.Euler (0, 0, 0f);
 
-			if (clampVerticalRotation) 
+			if (clampVerticallocalRotation) 
 			{
-				//m_CameraTargetRot = ClampRotationAroundXAxis (m_CameraTargetRot);
-				camera.rotation = ClampRotationAroundXAxis (camera.rotation);
+				m_CameraTargetRot = ClampRotationAroundXAxis (m_CameraTargetRot);
+				camera.localRotation = ClampRotationAroundXAxis (camera.localRotation);
 			}
 
             if(smooth)
             {
-				character.rotation = Quaternion.Slerp
+				character.localRotation = Quaternion.Slerp
 					(
-						character.rotation, 
+						character.localRotation, 
 						m_CharacterTargetRot,
                     	smoothTime * Time.deltaTime
 					);
 
 				/*
-				camera.rotation = Quaternion.Slerp 
+				camera.localRotation = Quaternion.Slerp 
 					(
-						camera.rotation, 
+						camera.localRotation, 
 						m_CameraTargetRot,
    	    	            smoothTime * Time.deltaTime
 					);*/
             }
             else
             {
-                character.rotation = m_CharacterTargetRot;
-				//camera.rotation = m_CameraTargetRot;
+                character.localRotation = m_CharacterTargetRot;
+				//camera.localRotation = m_CameraTargetRot;
             }
 
             UpdateCursorLock();

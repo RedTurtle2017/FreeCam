@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
 	public float MaxVelocity = 100;
 	public Vector3 Force;
 	public Transform CameraPivot;
+	public Vector2 Sensitivity;
 
 	[Header ("Shooting")]
 	public GameObject Shot;
@@ -20,7 +21,8 @@ public class PlayerController : MonoBehaviour
 
 	void Start () 
 	{
-		
+		Cursor.visible = false;
+		Cursor.lockState = CursorLockMode.Locked;
 	}
 
 	void FixedUpdate () 
@@ -40,6 +42,8 @@ public class PlayerController : MonoBehaviour
 
 	void LateUpdate ()
 	{
+		transform.Rotate (Vector3.up * Input.GetAxis ("Mouse X") * Sensitivity.x);
+		transform.Rotate (Vector3.left * Input.GetAxis ("Mouse Y") * Sensitivity.y);
 	}
 
 	void MoveKeyboard ()
@@ -56,7 +60,8 @@ public class PlayerController : MonoBehaviour
 
 		if (Input.GetKey (KeyCode.W)) 
 		{
-			childRb.AddRelativeForce (transform.InverseTransformDirection (0, 0, transform.forward.z * Force.z));
+			//childRb.AddRelativeForce (transform.InverseTransformDirection (0, 0, transform.forward.z * Force.z));
+			rb.AddRelativeForce (0, 0, Force.z);
 		}
 
 		if (Input.GetKey (KeyCode.S)) 

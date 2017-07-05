@@ -12,11 +12,6 @@ public class BulletScript : MonoBehaviour
 	{
 		playerRb = GameObject.FindGameObjectWithTag ("PlayerRb").GetComponent<Rigidbody> ();
 		rb = GetComponent<Rigidbody> ();
-		rb.velocity = transform.up * (speed.z * Time.deltaTime) + playerRb.velocity;
-	}
-
-	void Update () 
-	{
-		
+		rb.velocity = transform.up * speed.z * Time.deltaTime;
 	}
 }
