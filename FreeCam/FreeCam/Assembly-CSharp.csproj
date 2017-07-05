@@ -448,8 +448,10 @@
      <Compile Include="Assets\Scripts\FPSCounterJ.cs" />
      <Compile Include="Assets\Scripts\LookAtPlayer.cs" />
      <Compile Include="Assets\Scripts\ShrinkOverTime.cs" />
+     <Compile Include="Assets\Scripts\SimpleSmoothMouseLook.cs" />
      <Compile Include="Assets\Scripts\SmoothDampAngle.cs" />
      <Compile Include="Assets\Scripts\SmoothFollowOrig.cs" />
+     <Compile Include="Assets\Scripts\SmoothMouseLook.cs" />
      <Compile Include="Assets\TextMesh Pro\Examples\Scripts\Benchmark01.cs" />
      <Compile Include="Assets\TextMesh Pro\Examples\Scripts\Benchmark01_UGUI.cs" />
      <Compile Include="Assets\TextMesh Pro\Examples\Scripts\Benchmark02.cs" />

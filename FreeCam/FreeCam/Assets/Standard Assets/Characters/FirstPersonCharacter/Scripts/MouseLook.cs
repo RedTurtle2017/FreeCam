@@ -22,8 +22,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public void Init(Transform character, Transform camera)
         {
-            m_CharacterTargetRot = character.localRotation;
-			//m_CameraTargetRot = camera.localRotation;
+            m_CharacterTargetRot = character.rotation;
+			//m_CameraTargetRot = camera.rotation;
         }
 			
         public void LookRotation(Transform character, Transform camera)
@@ -42,25 +42,25 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if(smooth)
             {
-                character.localRotation = Quaternion.Slerp
+				character.rotation = Quaternion.Slerp
 					(
-						character.localRotation, 
+						character.rotation, 
 						m_CharacterTargetRot,
                     	smoothTime * Time.deltaTime
 					);
 
 				/*
-				camera.localRotation = Quaternion.Slerp 
+				camera.rotation = Quaternion.Slerp 
 					(
-						camera.localRotation, 
+						camera.rotation, 
 						m_CameraTargetRot,
    	    	            smoothTime * Time.deltaTime
 					);*/
             }
             else
             {
-                character.localRotation = m_CharacterTargetRot;
-				//camera.localRotation = m_CameraTargetRot;
+                character.rotation = m_CharacterTargetRot;
+				//camera.rotation = m_CameraTargetRot;
             }
 
             UpdateCursorLock();
