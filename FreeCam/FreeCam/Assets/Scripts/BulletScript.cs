@@ -8,21 +8,28 @@ public class BulletScript : MonoBehaviour
 	public Rigidbody rb;
 	public Rigidbody playerRb;
 	public float BumperForce;
+	public Collider BulletCol;
+	public float BulletColDelay = 0.1f;
 
 	void Start ()
 	{
+		Invoke ("EnableBulletCol", BulletColDelay);
 		playerRb = GameObject.FindGameObjectWithTag ("PlayerRb").GetComponent<Rigidbody> ();
 		rb = GetComponent<Rigidbody> ();
-		rb.velocity = transform.up * speed.z;
 	}
 
 	void FixedUpdate ()
 	{
-		//rb.velocity = transform.up * speed.z;
+		rb.velocity = transform.up * speed.z * Time.deltaTime;
 	}
 
 	void OnCollisionEnter (Collision col)
 	{
 		rb.AddForce (col.contacts [0].normal * BumperForce, ForceMode.Impulse);
+	}
+
+	void EnableBulletCol ()
+	{
+		BulletCol.enabled = true;
 	}
 }

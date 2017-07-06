@@ -33,20 +33,19 @@ public class PlayerController : MonoBehaviour
 
 	void FixedUpdate () 
 	{
-		if (Input.GetMouseButton (0)) 
+		if (playerActions.Shoot.Value > 0.1f) 
 		{
 			Shoot ();
 		}
 
 		MovePlayer ();
-
 		ClampVelocity ();
 	}
 
 	void LateUpdate ()
 	{
-		transform.Rotate (Vector3.up * Input.GetAxis ("Mouse X") * Sensitivity.x);
-		transform.Rotate (Vector3.left * Input.GetAxis ("Mouse Y") * Sensitivity.y);
+		transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
+		transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
 	}
 
 	void CreateBindings ()
@@ -92,38 +91,6 @@ public class PlayerController : MonoBehaviour
 
 	void MovePlayer ()
 	{
-		/*if (Input.GetKey (KeyCode.D)) 
-		{
-			rb.AddRelativeForce (Force.x, 0, 0);
-		}
-
-		if (Input.GetKey (KeyCode.A)) 
-		{
-			rb.AddRelativeForce (-Force.x, 0, 0);
-		}
-
-		if (Input.GetKey (KeyCode.W)) 
-		{
-			//childRb.AddRelativeForce (transform.InverseTransformDirection (0, 0, transform.forward.z * Force.z));
-			rb.AddRelativeForce (0, 0, Force.z);
-		}
-
-		if (Input.GetKey (KeyCode.S)) 
-		{
-			rb.AddRelativeForce (0, 0, -Force.z);
-		}
-
-		if (Input.GetKey (KeyCode.Space)) 
-		{
-			rb.AddRelativeForce (0, Force.y, 0);
-		}
-
-
-		if (Input.GetKey (KeyCode.LeftControl)) 
-		{
-			rb.AddRelativeForce (0, -Force.y, 0);
-		}*/
-
 		rb.AddRelativeForce 
 		(
 			playerActions.Move.Value.x * Force.x, 
