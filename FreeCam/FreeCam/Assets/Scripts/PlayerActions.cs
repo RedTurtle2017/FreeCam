@@ -17,6 +17,11 @@ public class PlayerActions : PlayerActionSet
 
 	public PlayerOneAxisAction Elevate;
 
+	public PlayerAction RollLeft;
+	public PlayerAction RollRight;
+
+	public OneAxisInputControl Roll;
+
 	public PlayerAction LookUp;
 	public PlayerAction LookDown;
 	public PlayerAction LookLeft;
@@ -26,6 +31,7 @@ public class PlayerActions : PlayerActionSet
 
 	public PlayerAction Shoot;
 	public PlayerAction Ability;
+	public PlayerAction Pause;
 
 	public PlayerActions ()
 	{
@@ -41,6 +47,11 @@ public class PlayerActions : PlayerActionSet
 
 		Elevate = CreateOneAxisPlayerAction (MoveDown, MoveUp);
 
+		RollLeft = CreatePlayerAction ("RollLeft");
+		RollRight = CreatePlayerAction ("RollRight");
+
+		Roll = CreateOneAxisPlayerAction (RollLeft, RollRight);
+
 		LookLeft = CreatePlayerAction ("LookLeft");
 		LookRight = CreatePlayerAction ("LookRight");
 		LookDown = CreatePlayerAction ("LookDown");
@@ -50,5 +61,6 @@ public class PlayerActions : PlayerActionSet
 
 		Shoot = CreatePlayerAction ("Shoot");
 		Ability = CreatePlayerAction ("Ability");
+		Pause = CreatePlayerAction ("Pause");
 	}
 }

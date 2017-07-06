@@ -11,21 +11,22 @@ public class BulletScript : MonoBehaviour
 	public Collider BulletCol;
 	public float BulletColDelay = 0.1f;
 
-	void Start ()
+	void Awake ()
 	{
 		Invoke ("EnableBulletCol", BulletColDelay);
 		playerRb = GameObject.FindGameObjectWithTag ("PlayerRb").GetComponent<Rigidbody> ();
 		rb = GetComponent<Rigidbody> ();
+		rb.velocity = transform.forward * speed.z * Time.deltaTime;
 	}
 
 	void FixedUpdate ()
 	{
-		rb.velocity = transform.up * speed.z * Time.deltaTime;
+		//rb.velocity = transform.forward * speed.z * Time.deltaTime;
 	}
 
 	void OnCollisionEnter (Collision col)
 	{
-		rb.AddForce (col.contacts [0].normal * BumperForce, ForceMode.Impulse);
+		//rb.velocity = (col.contacts [0].normal * BumperForce);
 	}
 
 	void EnableBulletCol ()

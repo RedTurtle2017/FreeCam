@@ -5,18 +5,29 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-
+	[Header ("Time")]
+	[Range (0, 100)]
+	public float TargetTimeScale = 1;
+	public float TimeScaleSmoothing = 1;
 
 	void Start () 
 	{
-		
+		Time.timeScale = 1;
+		TargetTimeScale = 1;
 	}
 
 	void Update () 
 	{
+		SetTimeScale ();
+
 		if (Input.GetKeyDown (KeyCode.R)) 
 		{
 			SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
 		}
+	}
+
+	void SetTimeScale ()
+	{
+		Time.timeScale = Mathf.Lerp (Time.timeScale, TargetTimeScale, TimeScaleSmoothing * Time.unscaledDeltaTime);
 	}
 }
