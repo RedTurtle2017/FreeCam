@@ -21,5 +21,11 @@ public class CaptureScreenshot : MonoBehaviour
 			PlayerPrefs.SetInt ("ScreenshotsTaken", ScreenshotsTaken);
 			Debug.Log ("Saved a screenshot with upscale of " + superSize);
 		}
+
+		if (Input.GetKeyDown (KeyCode.F10)) 
+		{
+			ScreenshotsTaken = 0;
+			PlayerPrefs.SetInt ("ScreenshotsTaken", 0);
+		}
 	}
 }
