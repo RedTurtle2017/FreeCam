@@ -14,19 +14,19 @@ public class BulletScript : MonoBehaviour
 	void Awake ()
 	{
 		Invoke ("EnableBulletCol", BulletColDelay);
-		playerRb = GameObject.FindGameObjectWithTag ("PlayerRb").GetComponent<Rigidbody> ();
+		playerRb = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody> ();
 		rb = GetComponent<Rigidbody> ();
 		rb.velocity = transform.forward * speed.z * Time.deltaTime;
+		rb.transform.rotation = Quaternion.LookRotation (rb.velocity);
 	}
 
 	void FixedUpdate ()
 	{
-		//rb.velocity = transform.forward * speed.z * Time.deltaTime;
 	}
 
 	void OnCollisionEnter (Collision col)
 	{
-		//rb.velocity = (col.contacts [0].normal * BumperForce);
+		rb.transform.rotation = Quaternion.LookRotation (rb.velocity);
 	}
 
 	void EnableBulletCol ()

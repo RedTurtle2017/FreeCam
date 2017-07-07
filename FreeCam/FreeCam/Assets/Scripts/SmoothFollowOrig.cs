@@ -29,7 +29,7 @@ public class SmoothFollowOrig : MonoBehaviour
 	private void Start ()
 	{
 		thisTransform = transform;
-		velocity = new Vector3(0.5f, 0.5f, 0.5f);
+		velocity = new Vector3 (0.5f, 0.5f, 0.5f);
 
 		if (target == null) 
 		{
@@ -74,17 +74,17 @@ public class SmoothFollowOrig : MonoBehaviour
 			#region Locks
 			if (LockX) 
 			{
-				newPos.x = thisTransform.position.x + offset.x;
+				newPos.x = thisTransform.localPosition.x + offset.x;
 			}
 			
 			if (LockY) 
 			{
-				newPos.y = thisTransform.position.y + offset.y;
+				newPos.y = thisTransform.localPosition.y + offset.y;
 			}
 			
 			if (LockZ) 
 			{
-				newPos.z = thisTransform.position.z + offset.z;
+				newPos.z = thisTransform.localPosition.z + offset.z;
 			}
 			#endregion
 		}

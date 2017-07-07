@@ -3,10 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using InControl;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour 
 {
 	public GameController gameControllerScript;
+	public int DeviceID = 1;
+
+	[Header ("Health")]
+	public float CurrentHealth = 100;
+	public float TargetHealth = 100;
+	public float StartingHealth = 100;
+	public float HealthVel;
+	public float HealthSmoothTime;
+	public Slider HealthSliderA;
+	public Slider HealthSliderB;
+	public TextMeshProUGUI HealthText;
+
+	[Header ("Lives")]
+	public int LivesLeft = 3;
+	public int StartingLives = 3;
+
+	public float ObstacleDamage = 2;
 
 	[Header ("Pause")]
 	public bool isPaused;
@@ -14,7 +32,6 @@ public class PlayerController : MonoBehaviour
 	[Header ("Movement")]
 	public bool UseKeyboardControls = true;
 	public Rigidbody rb;
-	public Rigidbody childRb;
 	public float MaxVelocity = 100;
 	public Vector3 Force;
 	public Transform CameraPivot;
@@ -46,28 +63,47 @@ public class PlayerController : MonoBehaviour
 	public float FireRate;
 	private float nextFire;
 
+	[Header ("Death")]
+	public bool Died;
+	public GameObject MeshObject;
+	public ParticleSystem PlayerExplosion;
+	public SmoothFollowOrig CameraPivotFollowScript;
+	public SmoothDampAngle CameraPivotSmoothDampAngleScript;
+
+	[Header ("Respawn")]
+	public Transform[] SpawnPoints;
+
 	public PlayerActions playerActions;
 
 	void Start () 
 	{
 		CreateBindings ();
-
-		Cursor.visible = false;
-		Cursor.lockState = CursorLockMode.Locked;
+		SetStartCursorState ();
+		SetStartHealth ();
+		SetStartLives ();
+		CameraPivotFollowScript.offset = Vector3.zero;
 	}
 
 	void Update ()
 	{
 		CheckPauseState ();
-
+		CheckHealthAmount ();
 		CheckParticleEngines ();
+
+		if (Died == false && CurrentHealth <= 0) 
+		{
+			Invoke ("ExplodePlayer", Random.Range (2, 3));
+			Died = true;
+		}
+
+		HealthText.text = "" + Mathf.Clamp(Mathf.Round (CurrentHealth), 0, 100);
 	}
 
 	void FixedUpdate () 
 	{
 		if (isPaused == false) 
 		{
-			if (playerActions.Shoot.Value > 0.1f) 
+			if (playerActions.Shoot.Value > 0.1f && CurrentHealth > 0) 
 			{
 				Shoot ();
 			}
@@ -136,35 +172,59 @@ public class PlayerController : MonoBehaviour
 		playerActions.Pause.AddDefaultBinding (InputControlType.Command);
 	}
 
+	void SetStartCursorState ()
+	{
+		Cursor.visible = false;
+		Cursor.lockState = CursorLockMode.Locked;
+	}
+
+	void SetStartHealth ()
+	{
+		CurrentHealth = 1;
+		TargetHealth = StartingHealth;
+	}
+
 	void MovePlayer ()
 	{
-		// Moving
-		rb.AddRelativeForce 
-		(
-			playerActions.Move.Value.x * Force.x, 
-			playerActions.Elevate.Value * Force.y, 
-			playerActions.Move.Value.y * Force.z
-		);
-
-		// Rolling
-		rb.AddRelativeTorque
-		(
-			0, 
-			0, 
-			playerActions.Roll.Value * -4 * Sensitivity.x
-		);
-
-		// Looking
-		if (UseKeyboardControls == false) 
+		if (CurrentHealth > 0)
 		{
-			transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
-			transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
+			// Moving
+			rb.AddRelativeForce 
+			(
+				playerActions.Move.Value.x * Force.x, 
+				playerActions.Elevate.Value * Force.y, 
+				playerActions.Move.Value.y * Force.z, ForceMode.Force
+			);
+
+			// Rolling
+			rb.AddRelativeTorque
+			(
+				0, 
+				0, 
+				playerActions.Roll.Value * -4 * Sensitivity.x, ForceMode.Acceleration
+			);
+
+			// Looking
+			if (UseKeyboardControls == false) 
+			{
+				transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
+				transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
+			}
+
+			if (UseKeyboardControls == true) 
+			{
+				transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x * 4);
+				transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 4);
+			}
 		}
 
-		if (UseKeyboardControls == true) 
+		if (CurrentHealth <= 0) 
 		{
-			transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x * 3);
-			transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 3);
+			rb.angularDrag = 0;
+			rb.drag = 0;
+			CameraPivotFollowScript.offset = new Vector3 (0, 0, -15);
+			CameraPivotFollowScript.transform.LookAt (gameObject.transform);
+			CameraPivotSmoothDampAngleScript.enabled = false;
 		}
 	}
 
@@ -209,193 +269,268 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	void CheckHealthAmount ()
+	{
+		CurrentHealth = Mathf.SmoothDamp (CurrentHealth, TargetHealth, ref HealthVel, HealthSmoothTime * Time.deltaTime);
+
+		HealthSliderA.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
+		HealthSliderB.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
+	}
+
 	void CheckParticleEngines ()
 	{
-		// Main engine
-		var MainEngineEmission = MainEngine.emission;
-		var MainEngineRateOverTime = MainEngineEmission.rateOverTime;
+		if (CurrentHealth > 0) 
+		{
+			// Main engine
+			var MainEngineEmission = MainEngine.emission;
+			var MainEngineRateOverTime = MainEngineEmission.rateOverTime;
 
-		MainEngineRateOverTime.constant = Mathf.Clamp 
+			MainEngineRateOverTime.constant = Mathf.Clamp 
 			(
 				transform.InverseTransformDirection (rb.velocity).z, 
 				0, MaxEngineEmissionRate * 2
 			);
-		MainEngineEmission.rateOverTime = MainEngineRateOverTime;
+			MainEngineEmission.rateOverTime = MainEngineRateOverTime;
 
-		// Top Front
-		var EngineTopFrontAEmission = EngineTopFrontA.emission;
-		var EngineTopFrontARateOverTime = EngineTopFrontAEmission.rateOverTime;
+			// Top Front
+			var EngineTopFrontAEmission = EngineTopFrontA.emission;
+			var EngineTopFrontARateOverTime = EngineTopFrontAEmission.rateOverTime;
 
-		EngineTopFrontARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookDown.Value + 
-					playerActions.LookRight.Value + 
-					playerActions.MoveDown.Value + 
-					playerActions.MoveRight.Value
-				), 0, MaxEngineEmissionRate);
-		EngineTopFrontAEmission.rateOverTime = EngineTopFrontARateOverTime;
+			EngineTopFrontARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookDown.Value +
+			    playerActions.LookRight.Value +
+			    playerActions.MoveDown.Value +
+			    playerActions.MoveRight.Value
+			), 0, MaxEngineEmissionRate);
+			EngineTopFrontAEmission.rateOverTime = EngineTopFrontARateOverTime;
 
-		var EngineTopFrontBEmission = EngineTopFrontB.emission;
-		var EngineTopFrontBRateOverTime = EngineTopFrontBEmission.rateOverTime;
+			var EngineTopFrontBEmission = EngineTopFrontB.emission;
+			var EngineTopFrontBRateOverTime = EngineTopFrontBEmission.rateOverTime;
 
-		EngineTopFrontBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookDown.Value + 
-					playerActions.LookLeft.Value + 
-					playerActions.MoveDown.Value + 
-					playerActions.MoveLeft.Value
-				), 0, MaxEngineEmissionRate);
-		EngineTopFrontBEmission.rateOverTime = EngineTopFrontBRateOverTime;
+			EngineTopFrontBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookDown.Value +
+			    playerActions.LookLeft.Value +
+			    playerActions.MoveDown.Value +
+			    playerActions.MoveLeft.Value
+			), 0, MaxEngineEmissionRate);
+			EngineTopFrontBEmission.rateOverTime = EngineTopFrontBRateOverTime;
 
-		// Top Rear
-		var EngineTopRearAEmission = EngineTopRearA.emission;
-		var EngineTopRearARateOverTime = EngineTopRearAEmission.rateOverTime;
+			// Top Rear
+			var EngineTopRearAEmission = EngineTopRearA.emission;
+			var EngineTopRearARateOverTime = EngineTopRearAEmission.rateOverTime;
 
-		EngineTopRearARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookUp.Value + 
-					playerActions.LookLeft.Value + 
-					playerActions.MoveDown.Value +
-					playerActions.MoveRight.Value
-				), 0, MaxEngineEmissionRate);
-		EngineTopRearAEmission.rateOverTime = EngineTopRearARateOverTime;
+			EngineTopRearARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookUp.Value +
+			    playerActions.LookLeft.Value +
+			    playerActions.MoveDown.Value +
+			    playerActions.MoveRight.Value
+			), 0, MaxEngineEmissionRate);
+			EngineTopRearAEmission.rateOverTime = EngineTopRearARateOverTime;
 
-		var EngineTopRearBEmission = EngineTopRearB.emission;
-		var EngineTopRearBRateOverTime = EngineTopRearBEmission.rateOverTime;
+			var EngineTopRearBEmission = EngineTopRearB.emission;
+			var EngineTopRearBRateOverTime = EngineTopRearBEmission.rateOverTime;
 
-		EngineTopRearBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookUp.Value + 
-					playerActions.LookRight.Value + 
-					playerActions.MoveDown.Value + 
-					playerActions.MoveLeft.Value
-				), 0, MaxEngineEmissionRate);
-		EngineTopRearBEmission.rateOverTime = EngineTopRearBRateOverTime;
+			EngineTopRearBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookUp.Value +
+			    playerActions.LookRight.Value +
+			    playerActions.MoveDown.Value +
+			    playerActions.MoveLeft.Value
+			), 0, MaxEngineEmissionRate);
+			EngineTopRearBEmission.rateOverTime = EngineTopRearBRateOverTime;
 
-		// Bottom Front
-		var EngineBottomFrontAEmission = EngineBottomFrontA.emission;
-		var EngineBottomFrontARateOverTime = EngineBottomFrontAEmission.rateOverTime;
+			// Bottom Front
+			var EngineBottomFrontAEmission = EngineBottomFrontA.emission;
+			var EngineBottomFrontARateOverTime = EngineBottomFrontAEmission.rateOverTime;
 
-		EngineBottomFrontARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookUp.Value + 
-					playerActions.LookRight.Value + 
-					playerActions.MoveUp.Value + 
-					playerActions.MoveRight.Value
-				), 0, MaxEngineEmissionRate);
-		EngineBottomFrontAEmission.rateOverTime = EngineBottomFrontARateOverTime;
+			EngineBottomFrontARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookUp.Value +
+			    playerActions.LookRight.Value +
+			    playerActions.MoveUp.Value +
+			    playerActions.MoveRight.Value
+			), 0, MaxEngineEmissionRate);
+			EngineBottomFrontAEmission.rateOverTime = EngineBottomFrontARateOverTime;
 
-		var EngineBottomFrontBEmission = EngineBottomFrontB.emission;
-		var EngineBottomFrontBRateOverTime = EngineBottomFrontBEmission.rateOverTime;
+			var EngineBottomFrontBEmission = EngineBottomFrontB.emission;
+			var EngineBottomFrontBRateOverTime = EngineBottomFrontBEmission.rateOverTime;
 
-		EngineBottomFrontBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookUp.Value + 
-					playerActions.LookLeft.Value + 
-					playerActions.MoveUp.Value +
-					playerActions.MoveLeft.Value
-				), 0, MaxEngineEmissionRate);
-		EngineBottomFrontBEmission.rateOverTime = EngineBottomFrontBRateOverTime;
+			EngineBottomFrontBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookUp.Value +
+			    playerActions.LookLeft.Value +
+			    playerActions.MoveUp.Value +
+			    playerActions.MoveLeft.Value
+			), 0, MaxEngineEmissionRate);
+			EngineBottomFrontBEmission.rateOverTime = EngineBottomFrontBRateOverTime;
 
-		// Bottom rear
-		var EngineBottomRearAEmission = EngineBottomRearA.emission;
-		var EngineBottomRearARateOverTime = EngineBottomFrontAEmission.rateOverTime;
+			// Bottom rear
+			var EngineBottomRearAEmission = EngineBottomRearA.emission;
+			var EngineBottomRearARateOverTime = EngineBottomFrontAEmission.rateOverTime;
 
-		EngineBottomRearARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookDown.Value + 
-					playerActions.LookLeft.Value + 
-					playerActions.MoveUp.Value + 
-					playerActions.MoveRight.Value
-				), 0, MaxEngineEmissionRate);
-		EngineBottomRearAEmission.rateOverTime = EngineBottomRearARateOverTime;
+			EngineBottomRearARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookDown.Value +
+			    playerActions.LookLeft.Value +
+			    playerActions.MoveUp.Value +
+			    playerActions.MoveRight.Value
+			), 0, MaxEngineEmissionRate);
+			EngineBottomRearAEmission.rateOverTime = EngineBottomRearARateOverTime;
 
-		var EngineBottomRearBEmission = EngineBottomRearB.emission;
-		var EngineBottomRearBRateOverTime = EngineBottomRearBEmission.rateOverTime;
+			var EngineBottomRearBEmission = EngineBottomRearB.emission;
+			var EngineBottomRearBRateOverTime = EngineBottomRearBEmission.rateOverTime;
 
-		EngineBottomRearBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(
-					playerActions.LookDown.Value + 
-					playerActions.LookRight.Value + 
-					playerActions.MoveUp.Value + 
-					playerActions.MoveLeft.Value
-				), 0, MaxEngineEmissionRate);
-		EngineBottomRearBEmission.rateOverTime = EngineBottomRearBRateOverTime;
+			EngineBottomRearBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(
+			    playerActions.LookDown.Value +
+			    playerActions.LookRight.Value +
+			    playerActions.MoveUp.Value +
+			    playerActions.MoveLeft.Value
+			), 0, MaxEngineEmissionRate);
+			EngineBottomRearBEmission.rateOverTime = EngineBottomRearBRateOverTime;
 
-		// Left side front
-		var EngineLeftSideFrontAEmission = EngineLeftSideFrontA.emission;
-		var EngineLeftSideFrontARateOverTime = EngineLeftSideFrontAEmission.rateOverTime;
+			// Left side front
+			var EngineLeftSideFrontAEmission = EngineLeftSideFrontA.emission;
+			var EngineLeftSideFrontARateOverTime = EngineLeftSideFrontAEmission.rateOverTime;
 
-		EngineLeftSideFrontARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
-		EngineLeftSideFrontAEmission.rateOverTime = EngineLeftSideFrontARateOverTime;
+			EngineLeftSideFrontARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+			EngineLeftSideFrontAEmission.rateOverTime = EngineLeftSideFrontARateOverTime;
 
-		var EngineLeftSideFrontBEmission = EngineLeftSideFrontB.emission;
-		var EngineLeftSideFrontBRateOverTime = EngineLeftSideFrontBEmission.rateOverTime;
+			var EngineLeftSideFrontBEmission = EngineLeftSideFrontB.emission;
+			var EngineLeftSideFrontBRateOverTime = EngineLeftSideFrontBEmission.rateOverTime;
 
-		EngineLeftSideFrontBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
-		EngineLeftSideFrontBEmission.rateOverTime = EngineLeftSideFrontBRateOverTime;
+			EngineLeftSideFrontBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+			EngineLeftSideFrontBEmission.rateOverTime = EngineLeftSideFrontBRateOverTime;
 
-		// Left side rear
-		var EngineLeftSideRearAEmission = EngineLeftSideRearA.emission;
-		var EngineLeftSideRearARateOverTime = EngineLeftSideRearAEmission.rateOverTime;
+			// Left side rear
+			var EngineLeftSideRearAEmission = EngineLeftSideRearA.emission;
+			var EngineLeftSideRearARateOverTime = EngineLeftSideRearAEmission.rateOverTime;
 
-		EngineLeftSideRearARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
-		EngineLeftSideRearAEmission.rateOverTime = EngineLeftSideRearARateOverTime;
+			EngineLeftSideRearARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+			EngineLeftSideRearAEmission.rateOverTime = EngineLeftSideRearARateOverTime;
 
-		var EngineLeftSideRearBEmission = EngineLeftSideRearB.emission;
-		var EngineLeftSideRearBRateOverTime = EngineLeftSideRearBEmission.rateOverTime;
+			var EngineLeftSideRearBEmission = EngineLeftSideRearB.emission;
+			var EngineLeftSideRearBRateOverTime = EngineLeftSideRearBEmission.rateOverTime;
 
-		EngineLeftSideRearBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
-		EngineLeftSideRearBEmission.rateOverTime = EngineLeftSideRearBRateOverTime;
+			EngineLeftSideRearBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+			EngineLeftSideRearBEmission.rateOverTime = EngineLeftSideRearBRateOverTime;
 
-		// Right side front
-		var EngineRightSideFrontAEmission = EngineRightSideFrontA.emission;
-		var EngineRightSideFrontARateOverTime = EngineRightSideFrontAEmission.rateOverTime;
+			// Right side front
+			var EngineRightSideFrontAEmission = EngineRightSideFrontA.emission;
+			var EngineRightSideFrontARateOverTime = EngineRightSideFrontAEmission.rateOverTime;
 
-		EngineRightSideFrontARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
-		EngineRightSideFrontAEmission.rateOverTime = EngineRightSideFrontARateOverTime;
+			EngineRightSideFrontARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+			EngineRightSideFrontAEmission.rateOverTime = EngineRightSideFrontARateOverTime;
 
-		var EngineRightSideFrontBEmission = EngineRightSideFrontB.emission;
-		var EngineRightSideFrontBRateOverTime = EngineRightSideFrontBEmission.rateOverTime;
+			var EngineRightSideFrontBEmission = EngineRightSideFrontB.emission;
+			var EngineRightSideFrontBRateOverTime = EngineRightSideFrontBEmission.rateOverTime;
 
-		EngineRightSideFrontBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
-		EngineRightSideFrontBEmission.rateOverTime = EngineRightSideFrontBRateOverTime;
+			EngineRightSideFrontBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+			EngineRightSideFrontBEmission.rateOverTime = EngineRightSideFrontBRateOverTime;
 
-		// Right side rear
-		var EngineRightSideRearAEmission = EngineRightSideRearA.emission;
-		var EngineRightSideRearARateOverTime = EngineRightSideRearAEmission.rateOverTime;
+			// Right side rear
+			var EngineRightSideRearAEmission = EngineRightSideRearA.emission;
+			var EngineRightSideRearARateOverTime = EngineRightSideRearAEmission.rateOverTime;
 
-		EngineRightSideRearARateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
-		EngineRightSideRearAEmission.rateOverTime = EngineRightSideRearARateOverTime;
+			EngineRightSideRearARateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+			EngineRightSideRearAEmission.rateOverTime = EngineRightSideRearARateOverTime;
 
-		var EngineRightSideRearBEmission = EngineRightSideRearB.emission;
-		var EngineRightSideRearBRateOverTime = EngineRightSideRearBEmission.rateOverTime;
+			var EngineRightSideRearBEmission = EngineRightSideRearB.emission;
+			var EngineRightSideRearBRateOverTime = EngineRightSideRearBEmission.rateOverTime;
 
-		EngineRightSideRearBRateOverTime.constant = 
-			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
-		EngineRightSideRearBEmission.rateOverTime = EngineRightSideRearBRateOverTime;
+			EngineRightSideRearBRateOverTime.constant = 
+			Mathf.Clamp (MaxEngineEmissionRate *
+			(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+			EngineRightSideRearBEmission.rateOverTime = EngineRightSideRearBRateOverTime;
+		}
+
+		if (CurrentHealth <= 0) 
+		{
+			
+		}
+	}
+
+	void OnCollisionEnter (Collision col)
+	{
+		//TargetHealth -= transform.InverseTransformDirection (rb.velocity).magnitude * ObstacleDamage;
+
+		if (col.collider.tag == "Obstacle") 
+		{
+			if (TargetHealth > 0) 
+			{
+				TargetHealth -= transform.InverseTransformDirection (rb.velocity).magnitude * ObstacleDamage;
+			}
+
+			if (TargetHealth <= 0) 
+			{
+				rb.AddRelativeTorque (
+					new Vector3 (
+						Random.Range (-50, 50),
+						Random.Range (-10, 10),
+						Random.Range (-250, 250)
+						), 
+					ForceMode.VelocityChange);
+			}
+		}
+	}
+
+	void SetStartLives ()
+	{
+		LivesLeft = StartingLives;
+	}
+
+	void ExplodePlayer ()
+	{
+		MeshObject.SetActive (false);
+		rb.velocity = Vector3.zero;
+		rb.angularVelocity = Vector3.zero;
+		PlayerExplosion.Play ();
+
+		if (LivesLeft > 0) 
+		{
+			StartCoroutine (RespawnPlayer ());
+		}
+	}
+
+	IEnumerator RespawnPlayer ()
+	{
+		yield return new WaitForSeconds (3);
+		CurrentHealth = 1;
+		LivesLeft -= 1;
+		rb.angularDrag = 2.0f;
+		rb.drag = 0.5f;
+		gameObject.transform.position = SpawnPoints [Random.Range (0, SpawnPoints.Length)].position;
+		gameObject.transform.rotation = SpawnPoints [Random.Range (0, SpawnPoints.Length)].rotation;
+		CameraPivotFollowScript.offset = new Vector3 (0, 0, 0);
+		TargetHealth = StartingHealth;
+		CameraPivotSmoothDampAngleScript.enabled = true;
+		yield return new WaitForSeconds (0.5f);
+		MeshObject.SetActive (true);
+		Died = false;
 	}
 }
