@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using InControl;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class PlayerController : MonoBehaviour 
 {
@@ -69,6 +70,9 @@ public class PlayerController : MonoBehaviour
 	public ParticleSystem PlayerExplosion;
 	public SmoothFollowOrig CameraPivotFollowScript;
 	public SmoothDampAngle CameraPivotSmoothDampAngleScript;
+	public AudioMixer Mixer;
+	public float TargetHighFreq;
+	public float HighPassFreqSmoothTime;
 
 	[Header ("Respawn")]
 	public Transform[] SpawnPoints;
@@ -90,10 +94,29 @@ public class PlayerController : MonoBehaviour
 		CheckHealthAmount ();
 		CheckParticleEngines ();
 
-		if (Died == false && CurrentHealth <= 0) 
+		float HighPassCuttoffFreqValue;
+
+		bool HighPassResult = Mixer.GetFloat ("HighPassCutoffFreq", out HighPassCuttoffFreqValue);
+
+		if (HighPassResult) 
 		{
-			Invoke ("ExplodePlayer", Random.Range (2, 3));
-			Died = true;
+			Mixer.SetFloat ("HighPassCutoffFreq", Mathf.Lerp (HighPassCuttoffFreqValue, TargetHighFreq, HighPassFreqSmoothTime * Time.deltaTime));
+		}
+
+		if (Died == false) 
+		{
+			if (CurrentHealth <= 0) 
+			{
+				Invoke ("ExplodePlayer", Random.Range (2, 3));
+				Died = true;
+			}
+
+			TargetHighFreq = 0;
+		}
+
+		if (Died == true) 
+		{
+			TargetHighFreq = 2500;
 		}
 
 		HealthText.text = "" + Mathf.Clamp(Mathf.Round (CurrentHealth), 0, 100);
@@ -477,8 +500,6 @@ public class PlayerController : MonoBehaviour
 
 	void OnCollisionEnter (Collision col)
 	{
-		//TargetHealth -= transform.InverseTransformDirection (rb.velocity).magnitude * ObstacleDamage;
-
 		if (col.collider.tag == "Obstacle") 
 		{
 			if (TargetHealth > 0) 
