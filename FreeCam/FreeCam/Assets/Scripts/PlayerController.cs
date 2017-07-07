@@ -82,7 +82,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (isPaused == false)
 		{
-			
+	
 		}
 	}
 
@@ -155,8 +155,17 @@ public class PlayerController : MonoBehaviour
 		);
 
 		// Looking
-		transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
-		transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
+		if (UseKeyboardControls == false) 
+		{
+			transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
+			transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
+		}
+
+		if (UseKeyboardControls == true) 
+		{
+			transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x * 3);
+			transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 3);
+		}
 	}
 
 	void ClampVelocity ()
@@ -202,13 +211,29 @@ public class PlayerController : MonoBehaviour
 
 	void CheckParticleEngines ()
 	{
+		// Main engine
+		var MainEngineEmission = MainEngine.emission;
+		var MainEngineRateOverTime = MainEngineEmission.rateOverTime;
+
+		MainEngineRateOverTime.constant = Mathf.Clamp 
+			(
+				transform.InverseTransformDirection (rb.velocity).z, 
+				0, MaxEngineEmissionRate * 2
+			);
+		MainEngineEmission.rateOverTime = MainEngineRateOverTime;
+
 		// Top Front
 		var EngineTopFrontAEmission = EngineTopFrontA.emission;
 		var EngineTopFrontARateOverTime = EngineTopFrontAEmission.rateOverTime;
 
 		EngineTopFrontARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookDown.Value + playerActions.LookRight.Value + playerActions.MoveDown.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookDown.Value + 
+					playerActions.LookRight.Value + 
+					playerActions.MoveDown.Value + 
+					playerActions.MoveRight.Value
+				), 0, MaxEngineEmissionRate);
 		EngineTopFrontAEmission.rateOverTime = EngineTopFrontARateOverTime;
 
 		var EngineTopFrontBEmission = EngineTopFrontB.emission;
@@ -216,7 +241,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineTopFrontBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookDown.Value + playerActions.LookLeft.Value + playerActions.MoveDown.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookDown.Value + 
+					playerActions.LookLeft.Value + 
+					playerActions.MoveDown.Value + 
+					playerActions.MoveLeft.Value
+				), 0, MaxEngineEmissionRate);
 		EngineTopFrontBEmission.rateOverTime = EngineTopFrontBRateOverTime;
 
 		// Top Rear
@@ -225,7 +255,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineTopRearARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookUp.Value + +playerActions.LookLeft.Value + playerActions.MoveDown.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookUp.Value + 
+					playerActions.LookLeft.Value + 
+					playerActions.MoveDown.Value +
+					playerActions.MoveRight.Value
+				), 0, MaxEngineEmissionRate);
 		EngineTopRearAEmission.rateOverTime = EngineTopRearARateOverTime;
 
 		var EngineTopRearBEmission = EngineTopRearB.emission;
@@ -233,7 +268,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineTopRearBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookUp.Value + playerActions.LookRight.Value + playerActions.MoveDown.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookUp.Value + 
+					playerActions.LookRight.Value + 
+					playerActions.MoveDown.Value + 
+					playerActions.MoveLeft.Value
+				), 0, MaxEngineEmissionRate);
 		EngineTopRearBEmission.rateOverTime = EngineTopRearBRateOverTime;
 
 		// Bottom Front
@@ -242,7 +282,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineBottomFrontARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookUp.Value + playerActions.LookRight.Value + playerActions.MoveUp.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookUp.Value + 
+					playerActions.LookRight.Value + 
+					playerActions.MoveUp.Value + 
+					playerActions.MoveRight.Value
+				), 0, MaxEngineEmissionRate);
 		EngineBottomFrontAEmission.rateOverTime = EngineBottomFrontARateOverTime;
 
 		var EngineBottomFrontBEmission = EngineBottomFrontB.emission;
@@ -250,7 +295,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineBottomFrontBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookUp.Value + playerActions.LookLeft.Value + playerActions.MoveUp.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookUp.Value + 
+					playerActions.LookLeft.Value + 
+					playerActions.MoveUp.Value +
+					playerActions.MoveLeft.Value
+				), 0, MaxEngineEmissionRate);
 		EngineBottomFrontBEmission.rateOverTime = EngineBottomFrontBRateOverTime;
 
 		// Bottom rear
@@ -259,7 +309,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineBottomRearARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookDown.Value + playerActions.LookLeft.Value + playerActions.MoveUp.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookDown.Value + 
+					playerActions.LookLeft.Value + 
+					playerActions.MoveUp.Value + 
+					playerActions.MoveRight.Value
+				), 0, MaxEngineEmissionRate);
 		EngineBottomRearAEmission.rateOverTime = EngineBottomRearARateOverTime;
 
 		var EngineBottomRearBEmission = EngineBottomRearB.emission;
@@ -267,7 +322,12 @@ public class PlayerController : MonoBehaviour
 
 		EngineBottomRearBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.LookDown.Value + playerActions.LookRight.Value + playerActions.MoveUp.Value), 0, MaxEngineEmissionRate);
+				(
+					playerActions.LookDown.Value + 
+					playerActions.LookRight.Value + 
+					playerActions.MoveUp.Value + 
+					playerActions.MoveLeft.Value
+				), 0, MaxEngineEmissionRate);
 		EngineBottomRearBEmission.rateOverTime = EngineBottomRearBRateOverTime;
 
 		// Left side front
@@ -276,7 +336,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineLeftSideFrontARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveRight.Value + playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
 		EngineLeftSideFrontAEmission.rateOverTime = EngineLeftSideFrontARateOverTime;
 
 		var EngineLeftSideFrontBEmission = EngineLeftSideFrontB.emission;
@@ -284,7 +344,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineLeftSideFrontBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveRight.Value + playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
 		EngineLeftSideFrontBEmission.rateOverTime = EngineLeftSideFrontBRateOverTime;
 
 		// Left side rear
@@ -293,7 +353,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineLeftSideRearARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveRight.Value + playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
 		EngineLeftSideRearAEmission.rateOverTime = EngineLeftSideRearARateOverTime;
 
 		var EngineLeftSideRearBEmission = EngineLeftSideRearB.emission;
@@ -301,7 +361,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineLeftSideRearBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveRight.Value + playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
 		EngineLeftSideRearBEmission.rateOverTime = EngineLeftSideRearBRateOverTime;
 
 		// Right side front
@@ -310,7 +370,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineRightSideFrontARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveLeft.Value + playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
 		EngineRightSideFrontAEmission.rateOverTime = EngineRightSideFrontARateOverTime;
 
 		var EngineRightSideFrontBEmission = EngineRightSideFrontB.emission;
@@ -318,7 +378,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineRightSideFrontBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveLeft.Value + playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
 		EngineRightSideFrontBEmission.rateOverTime = EngineRightSideFrontBRateOverTime;
 
 		// Right side rear
@@ -327,7 +387,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineRightSideRearARateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveLeft.Value + playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollLeft.Value), 0, MaxEngineEmissionRate);
 		EngineRightSideRearAEmission.rateOverTime = EngineRightSideRearARateOverTime;
 
 		var EngineRightSideRearBEmission = EngineRightSideRearB.emission;
@@ -335,7 +395,7 @@ public class PlayerController : MonoBehaviour
 
 		EngineRightSideRearBRateOverTime.constant = 
 			Mathf.Clamp(MaxEngineEmissionRate *
-				(playerActions.MoveLeft.Value + playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
+				(playerActions.RollRight.Value), 0, MaxEngineEmissionRate);
 		EngineRightSideRearBEmission.rateOverTime = EngineRightSideRearBRateOverTime;
 	}
 }
