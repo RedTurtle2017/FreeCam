@@ -6,16 +6,21 @@ public class Obstacle : MonoBehaviour
 {
 	//public AudioSource Soundtrack;
 	public AudioSourceLoudnessTester AudioLoudness;
-	public float ScaleMultiplier;
-	public float AddScale = 30;
-	public float ScaleVel;
-	public float ScaleSmoothing = 1;
+
+	public Vector2 ScaleMultRange;
+	public Vector2 AddScaleRange;
+	public Vector2 ScaleSmoothRange;
+
+	private float ScaleMultiplier;
+	private float AddScale = 30;
+	private float ScaleVel;
+	private float ScaleSmoothing = 1;
 
 	void Start () 
 	{
-		AddScale = Random.Range (30, 60);
-		ScaleMultiplier = Random.Range (60, 120);
-		ScaleSmoothing = Random.Range (4, 7);
+		AddScale = Random.Range (AddScaleRange.x, AddScaleRange.y);
+		ScaleMultiplier = Random.Range (ScaleMultRange.x, ScaleMultRange.y);
+		ScaleSmoothing = Random.Range (ScaleSmoothRange.x, ScaleSmoothRange.y);
 	}
 
 	void Update () 

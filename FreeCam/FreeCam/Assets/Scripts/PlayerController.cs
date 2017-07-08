@@ -37,6 +37,10 @@ public class PlayerController : MonoBehaviour
 	public Vector3 Force;
 	public Transform CameraPivot;
 	public Vector2 Sensitivity;
+	public float LookSmoothing;
+	private float LookSmoothVel;
+	public Transform PlayerRotation;
+	public Rigidbody PlayerRotationRb;
 
 	[Header ("Engines")]
 	public float MaxEngineEmissionRate;
@@ -60,7 +64,10 @@ public class PlayerController : MonoBehaviour
 
 	[Header ("Shooting")]
 	public GameObject Shot;
-	public Transform ShotSpawn;
+	public Transform ShotSpawnL;
+	public Transform ShotSpawnR;
+	public bool usePrimaryBarrel;
+
 	public float FireRate;
 	private float nextFire;
 
@@ -220,7 +227,7 @@ public class PlayerController : MonoBehaviour
 			);
 
 			// Rolling
-			rb.AddRelativeTorque
+			PlayerRotationRb.AddRelativeTorque
 			(
 				0, 
 				0, 
@@ -230,14 +237,18 @@ public class PlayerController : MonoBehaviour
 			// Looking
 			if (UseKeyboardControls == false) 
 			{
-				transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
-				transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
+				PlayerRotation.transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
+				PlayerRotation.transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
 			}
 
 			if (UseKeyboardControls == true) 
 			{
-				transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x * 4);
-				transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 4);
+				Vector3 RotateVertical = Vector3.up * playerActions.Look.Value.x * Sensitivity.x * 4;
+				Vector3 RotateHorizontal = Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 4;
+
+				PlayerRotation.transform.Rotate (RotateVertical);
+				PlayerRotation.transform.Rotate (RotateHorizontal);
+			
 			}
 		}
 
@@ -265,7 +276,18 @@ public class PlayerController : MonoBehaviour
 	{
 		if (Time.time > nextFire) 
 		{
-			Instantiate (Shot, ShotSpawn.position, ShotSpawn.rotation);
+			usePrimaryBarrel = !usePrimaryBarrel;
+
+			if (usePrimaryBarrel) 
+			{
+				Instantiate (Shot, ShotSpawnL.position, ShotSpawnL.rotation);
+			}
+
+			if (!usePrimaryBarrel) 
+			{
+				Instantiate (Shot, ShotSpawnR.position, ShotSpawnR.rotation);
+			}
+
 			nextFire = Time.time + FireRate;
 		}
 	}
