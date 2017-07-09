@@ -12,6 +12,7 @@ public class SmoothFollowOrig : MonoBehaviour
 	public bool LockZ;
 	public bool useSmoothing;
 	public Transform target;
+	public string targetObjectName;
 	#endregion
 	
 	#region Private Properties
@@ -31,18 +32,18 @@ public class SmoothFollowOrig : MonoBehaviour
 		thisTransform = transform;
 		velocity = new Vector3 (0.5f, 0.5f, 0.5f);
 
-		if (target == null) 
+		/*if (target == null) 
 		{
 			target = GameObject.FindGameObjectWithTag ("PlayerOne").transform;
-		}
+		}*/
 	}
 
 	void start ()
 	{
-		if (target == null) 
+		/*if (target == null) 
 		{
 			target = GameObject.FindGameObjectWithTag ("Player").transform;
-		}
+		}*/
 
 		if (OnlyInStart == true) 
 		{
@@ -87,6 +88,14 @@ public class SmoothFollowOrig : MonoBehaviour
 				newPos.z = thisTransform.localPosition.z + offset.z;
 			}
 			#endregion
+		}
+	}
+
+	void Update ()
+	{
+		if (target == null) 
+		{
+			target = GameObject.Find (targetObjectName).transform;
 		}
 	}
 

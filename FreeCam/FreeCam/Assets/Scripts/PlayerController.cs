@@ -6,7 +6,7 @@ using InControl;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 
-public class PlayerController : MonoBehaviour 
+public class PlayerController : MonoBehaviour
 {
 	public GameController gameControllerScript;
 	public int DeviceID = 1;
@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviour
 	public float HealthSmoothTime;
 	public Slider HealthSliderA;
 	public Slider HealthSliderB;
-	public TextMeshProUGUI HealthText;
 
 	[Header ("Lives")]
 	public int LivesLeft = 3;
@@ -37,6 +36,7 @@ public class PlayerController : MonoBehaviour
 	public Vector3 Force;
 	public Transform CameraPivot;
 	public Vector2 Sensitivity;
+	public float RollSpeed = 2;
 	public float LookSmoothing;
 	private float LookSmoothVel;
 	public Transform PlayerRotation;
@@ -82,7 +82,7 @@ public class PlayerController : MonoBehaviour
 	public float HighPassFreqSmoothTime;
 
 	[Header ("Respawn")]
-	public Transform[] SpawnPoints;
+	public GameObject[] SpawnPoints;
 
 	public PlayerActions playerActions;
 
@@ -112,7 +112,7 @@ public class PlayerController : MonoBehaviour
 
 		if (Died == false) 
 		{
-			if (CurrentHealth <= 0) 
+			if (CurrentHealth <= 0)
 			{
 				Invoke ("ExplodePlayer", Random.Range (2, 3));
 				Died = true;
@@ -121,17 +121,15 @@ public class PlayerController : MonoBehaviour
 			TargetHighFreq = 0;
 		}
 
-		if (Died == true) 
+		if (Died == true)
 		{
 			TargetHighFreq = 2500;
 		}
-
-		HealthText.text = "" + Mathf.Clamp(Mathf.Round (CurrentHealth), 0, 100);
 	}
 
 	void FixedUpdate () 
 	{
-		if (isPaused == false) 
+		if (isPaused == false)
 		{
 			if (playerActions.Shoot.Value > 0.1f && CurrentHealth > 0) 
 			{
@@ -231,7 +229,7 @@ public class PlayerController : MonoBehaviour
 			(
 				0, 
 				0, 
-				playerActions.Roll.Value * -4 * Sensitivity.x, ForceMode.Acceleration
+				playerActions.Roll.Value * -4 * RollSpeed, ForceMode.Acceleration
 			);
 
 			// Looking
@@ -271,7 +269,7 @@ public class PlayerController : MonoBehaviour
 				Mathf.Clamp (rb.velocity.z, -MaxVelocity, MaxVelocity)
 			);
 	}
-
+		
 	void Shoot ()
 	{
 		if (Time.time > nextFire) 
@@ -567,8 +565,8 @@ public class PlayerController : MonoBehaviour
 		LivesLeft -= 1;
 		rb.angularDrag = 2.0f;
 		rb.drag = 0.5f;
-		gameObject.transform.position = SpawnPoints [Random.Range (0, SpawnPoints.Length)].position;
-		gameObject.transform.rotation = SpawnPoints [Random.Range (0, SpawnPoints.Length)].rotation;
+		gameObject.transform.position = SpawnPoints [Random.Range (0, SpawnPoints.Length)].transform.position;
+		gameObject.transform.rotation = SpawnPoints [Random.Range (0, SpawnPoints.Length)].transform.rotation;
 		CameraPivotFollowScript.offset = new Vector3 (0, 0, 0);
 		TargetHealth = StartingHealth;
 		CameraPivotSmoothDampAngleScript.enabled = true;

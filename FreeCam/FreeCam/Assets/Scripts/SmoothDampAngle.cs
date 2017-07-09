@@ -6,13 +6,23 @@ public class SmoothDampAngle : MonoBehaviour
 {
 	public Transform Reference;
 	public Vector3 Angle;
-	//public Quaternion AngleQ;
+	public bool overrideReference;
+	public string ObjectFinderName;
+
 	public Vector3 smoothTime;
 	public method MatchMethod;
 	public enum method
 	{
 		EulerAngles,
 		Slerp
+	}
+
+	void Update ()
+	{
+		if (Reference == null)
+		{
+			Reference = GameObject.Find (ObjectFinderName).transform;
+		}
 	}
 		
 	void LateUpdate () 

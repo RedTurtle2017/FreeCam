@@ -1,12 +1,15 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 public class GameController : MonoBehaviour
 {
 	[Header ("Players")]
 	public int NumberOfPlayers = 1;
+	public GameObject PlayerOne;
 	public PlayerController playerControllerScript;
 	
 	[Header ("Time")]

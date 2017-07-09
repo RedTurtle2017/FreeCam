@@ -493,11 +493,15 @@
      <Compile Include="Assets\Scripts\AudioSync.cs" />
      <Compile Include="Assets\Scripts\BulletScript.cs" />
      <Compile Include="Assets\Scripts\CaptureScreenshot.cs" />
+     <Compile Include="Assets\Scripts\DestroyByBoundary.cs" />
      <Compile Include="Assets\Scripts\DiscoAudioVisualizer.cs" />
+     <Compile Include="Assets\Scripts\DontDestoryOnLoadScript.cs" />
      <Compile Include="Assets\Scripts\FPSCounterJ.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\LookAtPlayer.cs" />
      <Compile Include="Assets\Scripts\Obstacle.cs" />
+     <Compile Include="Assets\Scripts\OscillateRotationOverTime.cs" />
+     <Compile Include="Assets\Scripts\ParentToTransform.cs" />
      <Compile Include="Assets\Scripts\PitchByOtherAudioSourcePitch.cs" />
      <Compile Include="Assets\Scripts\PitchSync.cs" />
      <Compile Include="Assets\Scripts\PlayerActions.cs" />
