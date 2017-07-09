@@ -33,6 +33,9 @@ public class PlayerActions : PlayerActionSet
 	public PlayerAction Ability;
 	public PlayerAction Pause;
 
+	public PlayerAction NextWeapon;
+	public PlayerAction PreviousWeapon;
+
 	public PlayerActions ()
 	{
 		MoveLeft = CreatePlayerAction ("MoveLeft");
@@ -62,5 +65,8 @@ public class PlayerActions : PlayerActionSet
 		Shoot = CreatePlayerAction ("Shoot");
 		Ability = CreatePlayerAction ("Ability");
 		Pause = CreatePlayerAction ("Pause");
+
+		NextWeapon = CreatePlayerAction ("NextWeapon");
+		PreviousWeapon = CreatePlayerAction ("PreviousWeapon");
 	}
 }
