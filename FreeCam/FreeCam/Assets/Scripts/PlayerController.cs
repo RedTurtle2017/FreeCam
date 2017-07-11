@@ -5,6 +5,7 @@ using TMPro;
 using InControl;
 using UnityEngine.UI;
 using UnityEngine.Audio;
+using UnityEngine.PostProcessing;
 
 public class PlayerController : MonoBehaviour
 {
@@ -42,6 +43,9 @@ public class PlayerController : MonoBehaviour
 	private float LookSmoothVel;
 	public Transform PlayerRotation;
 	public Rigidbody PlayerRotationRb;
+	public Image SpeedOmeterImage;
+	public TextMeshProUGUI SpeedText;
+	public CameraShake CamShakeScript;
 
 	[Header ("Engines")]
 	public float MaxEngineEmissionRate;
@@ -128,6 +132,9 @@ public class PlayerController : MonoBehaviour
 	public float MaxDeadTime = 0.5f;
 	public Transform DeadPlayerFollow;
 	public AudioSource PlayerExplosionSound;
+	public Animator TauntText;
+	public TextMeshProUGUI TauntTextString;
+	public string[] Taunts;
 
 	public GameObject RespawnUI;
 
@@ -135,6 +142,10 @@ public class PlayerController : MonoBehaviour
 	public GameObject[] SpawnPoints;
 
 	public PlayerActions playerActions;
+
+	[Header ("Visuals")]
+	public PostProcessingProfile MainPostProcess;
+	public PostProcessingProfile OverPostProcess;
 
 	void Start () 
 	{
@@ -151,65 +162,10 @@ public class PlayerController : MonoBehaviour
 		CheckHealthAmount ();
 		CheckParticleEngines ();
 		CheckWeaponId ();
-
-		float HighPassCuttoffFreqValue;
-
-		bool HighPassResult = Mixer.GetFloat ("HighPassCutoffFreq", out HighPassCuttoffFreqValue);
-
-		if (HighPassResult) 
-		{
-			Mixer.SetFloat ("HighPassCutoffFreq", Mathf.Lerp (HighPassCuttoffFreqValue, TargetHighFreq, HighPassFreqSmoothTime * Time.deltaTime));
-		}
-
-		if (Died == false) 
-		{
-			if (CurrentHealth <= 0)
-			{
-				Invoke ("ExplodePlayer", Random.Range (0.5f, 1));
-				Died = true;
-			}
-
-			TargetHighFreq = 0;
-		}
-
-		if (Died == true)
-		{
-			TargetHighFreq = 2500;
-		}
-
-		if (isPaused == false && CooldownTime > 0) 
-		{
-			CoolDownImage.fillAmount = CooldownTime;
-			CooldownTime -= Time.deltaTime * WeaponCooldownTime[WeaponId - 1];
-			CoolDownImage.color = new Color (1, 0, 0, Mathf.Clamp(CooldownTime, 0, 0.7f));
-			CoolDownImage.rectTransform.sizeDelta = new Vector2 (9 * CooldownTime, 9 * CooldownTime);
-		}
-
-		if (CooldownTime > CooldownThreshold) 
-		{
-			if (CooldownWarning.isPlaying == false) 
-			{
-				CooldownWarning.Play ();
-			}
-
-			if (CooldownWarningParticles.isPlaying == false) 
-			{
-				CooldownWarningParticles.Play ();
-			}
-		}
-
-		if (CooldownTime <= CooldownThreshold) 
-		{
-			if (CooldownWarning.isPlaying == true)
-			{
-				CooldownWarning.Stop ();
-			}
-
-			if (CooldownWarningParticles.isPlaying == true) 
-			{
-				CooldownWarningParticles.Stop (false, ParticleSystemStopBehavior.StopEmitting);
-			}
-		}
+		CheckSpeed ();
+		CheckAudio ();
+		CheckCooldown ();
+		CheckVisuals ();
 	}
 
 	void FixedUpdate () 
@@ -265,7 +221,7 @@ public class PlayerController : MonoBehaviour
 		playerActions.MoveUp.AddDefaultBinding (Key.Space);
 		playerActions.MoveUp.AddDefaultBinding (InputControlType.Action1);
 
-		playerActions.MoveDown.AddDefaultBinding (Key.LeftControl);
+		playerActions.MoveDown.AddDefaultBinding (Key.C);
 		playerActions.MoveDown.AddDefaultBinding (InputControlType.Action4);
 
 		playerActions.RollLeft.AddDefaultBinding (Key.Q);
@@ -293,6 +249,7 @@ public class PlayerController : MonoBehaviour
 		playerActions.LookUp.AddDefaultBinding (InputControlType.RightStickUp);
 
 		playerActions.Shoot.AddDefaultBinding (Mouse.LeftButton);
+		playerActions.Shoot.AddDefaultBinding (Key.LeftControl);
 		playerActions.Shoot.AddDefaultBinding (InputControlType.RightTrigger);
 
 		playerActions.Ability.AddDefaultBinding (Mouse.RightButton);
@@ -354,7 +311,7 @@ public class PlayerController : MonoBehaviour
 
 		if (CurrentHealth <= 0) 
 		{
-			if (Died == true) 
+			if (Died == true && RespawnUI.activeSelf == true) 
 			{
 				rb.angularDrag = 0;
 				rb.drag = 0;
@@ -382,17 +339,22 @@ public class PlayerController : MonoBehaviour
 		{
 			rb.velocity = rb.velocity.normalized * MaxVelocity;
 		}
+
+		if (rb.velocity.sqrMagnitude < 0) 
+		{
+			rb.velocity = rb.velocity.normalized;
+		}
 	}
 		
 	void Shoot ()
 	{
-		if (Time.time > nextFire && CoolDownImage.fillAmount < 0.99f) 
+		if (Time.time > nextFire)
 		{
-			if (WeaponId == 1)
+			if (WeaponId == 1) 
 			{
 				usePrimaryBarrel = !usePrimaryBarrel;
 
-				if (usePrimaryBarrel) 
+				if (usePrimaryBarrel)
 				{
 					Instantiate (Shot, ShotSpawnL.position, ShotSpawnL.rotation);
 				}
@@ -403,9 +365,91 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 
-			nextFire = Time.time + FireRate;
+			if (CoolDownImage.fillAmount < 0.99f) 
+			{
+				nextFire = Time.time + FireRate;
+			}
 
-			CooldownTime += AddCooldownTime[WeaponId - 1];
+			if (CoolDownImage.fillAmount > 0.9f) 
+			{
+				nextFire = Time.time + FireRate * 2;
+			}
+
+			CooldownTime += AddCooldownTime [WeaponId - 1];
+		}
+	}
+
+	void CheckCooldown ()
+	{
+		if (isPaused == false && CooldownTime > 0) 
+		{
+			CoolDownImage.fillAmount = CooldownTime;
+			CooldownTime -= Time.deltaTime * WeaponCooldownTime[WeaponId - 1];
+			CoolDownImage.color = new Color (1, 0, 0, Mathf.Clamp(CooldownTime, 0, 0.7f));
+			CoolDownImage.rectTransform.sizeDelta = new Vector2 (9 * CooldownTime, 9 * CooldownTime);
+		}
+
+		if (CooldownTime > CooldownThreshold) 
+		{
+			if (CooldownWarning.isPlaying == false) 
+			{
+				CooldownWarning.Play ();
+			}
+
+			if (CooldownWarningParticles.isPlaying == false) 
+			{
+				CooldownWarningParticles.Play ();
+			}
+		}
+
+		if (CooldownTime <= CooldownThreshold) 
+		{
+			if (CooldownWarning.isPlaying == true)
+			{
+				CooldownWarning.Stop ();
+			}
+
+			if (CooldownWarningParticles.isPlaying == true) 
+			{
+				CooldownWarningParticles.Stop (false, ParticleSystemStopBehavior.StopEmitting);
+			}
+		}
+	}
+
+	void CheckSpeed ()
+	{
+		if (Died == false) 
+		{
+			SpeedOmeterImage.fillAmount = (rb.velocity.magnitude * 0.75f) / MaxVelocity;
+			SpeedText.text = "" + Mathf.Round (rb.velocity.magnitude) * 10;
+		}
+	}
+
+	void CheckAudio ()
+	{
+		float HighPassCuttoffFreqValue;
+
+		bool HighPassResult = Mixer.GetFloat ("HighPassCutoffFreq", out HighPassCuttoffFreqValue);
+
+		if (HighPassResult) 
+		{
+			Mixer.SetFloat ("HighPassCutoffFreq", Mathf.Lerp (HighPassCuttoffFreqValue, TargetHighFreq, HighPassFreqSmoothTime * Time.deltaTime));
+		}
+
+		if (Died == false) 
+		{
+			if (CurrentHealth <= 0)
+			{
+				Invoke ("ExplodePlayer", Random.Range (0.5f, 1));
+				Died = true;
+			}
+
+			TargetHighFreq = 0;
+		}
+
+		if (Died == true)
+		{
+			TargetHighFreq = 2500;
 		}
 	}
 
@@ -429,6 +473,22 @@ public class PlayerController : MonoBehaviour
 				Cursor.lockState = CursorLockMode.Locked;
 			}
 		}
+	}
+
+	void CheckVisuals ()
+	{
+		var MotionBlurSettings = MainPostProcess.motionBlur.settings;
+		MotionBlurSettings.shutterAngle = Mathf.Clamp (4 * rb.velocity.magnitude - 300, 0, 300);
+
+		MainPostProcess.motionBlur.settings = MotionBlurSettings;
+
+		var ChromaticAbberationSettings = MainPostProcess.chromaticAberration.settings;
+		ChromaticAbberationSettings.intensity = Mathf.Clamp ((2 * rb.velocity.magnitude) / (MaxVelocity + 500f), 0, 0.8f);
+
+		MainPostProcess.chromaticAberration.settings = ChromaticAbberationSettings;
+
+		Camera.main.fieldOfView = Mathf.Clamp (0.4375f * rb.velocity.magnitude + 30, 30, 100);
+		//Camera.main.fieldOfView = Mathf.Clamp (-0.5625f * rb.velocity.magnitude + 120, 30, 120);
 	}
 
 	void CheckHealthAmount ()
@@ -649,6 +709,7 @@ public class PlayerController : MonoBehaviour
 				if (HitSound.isPlaying == false)
 				{
 					HitSound.Play ();
+					CamShakeScript.shakeTimeRemaining = CamShakeScript.shakeDuration;
 				}
 			}
 
@@ -687,10 +748,13 @@ public class PlayerController : MonoBehaviour
 	void ExplodePlayer ()
 	{
 		MeshObject.SetActive (false);
+		GetComponent<ConstantForce> ().relativeForce = Vector3.zero;
 		rb.velocity = Vector3.zero;
 		rb.angularVelocity = Vector3.zero;
 		PlayerExplosion.Play ();
 		PlayerExplosionSound.Play ();
+		SpeedOmeterImage.fillAmount = 0;
+		SpeedText.text = "" + 0;
 
 		if (LivesLeft > 0) 
 		{
@@ -700,17 +764,21 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator RespawnPlayer ()
 	{
-		yield return new WaitForSecondsRealtime (3);
+		rb.velocity = Vector3.zero;
+		TauntTextString.text = Taunts [Random.Range (0, Taunts.Length)];
+		TauntText.Play ("TauntText");
+		yield return new WaitForSecondsRealtime (1);
 		CurrentHealth = 1;
 		LivesLeft -= 1;
-		rb.angularDrag = 2.0f;
-		rb.drag = 0.5f;
 		yield return new WaitForSecondsRealtime (1);
 		RespawnUI.SetActive (true);
 	}
 
 	public void RespawnPlayerNow ()
 	{
+		GetComponent<ConstantForce> ().relativeForce = new Vector3 (0, 0, 400);
+		rb.angularDrag = 2.0f;
+		rb.drag = 0.96f;
 		gameObject.transform.position = SpawnPoints [Random.Range (0, SpawnPoints.Length)].transform.position;
 		gameObject.transform.rotation = SpawnPoints [Random.Range (0, SpawnPoints.Length)].transform.rotation;
 		CameraPivotFollowScript.target = gameObject.transform;
@@ -718,6 +786,12 @@ public class PlayerController : MonoBehaviour
 		RespawnUI.SetActive (false);
 		CameraPivotFollowScript.SMOOTH_TIME = 0.02f;
 		MeshObject.SetActive (true);
+		StartCoroutine (EnableShooting ());
+	}
+
+	IEnumerator EnableShooting ()
+	{
+		yield return new WaitForSeconds (1);
 		Died = false;
 	}
 
