@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeCam", "Assembly-CSharp-firstpass.csproj", "{490CA2CE-4F70-E798-53A2-E4A37B1FF86B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{490CA2CE-4F70-E798-53A2-E4A37B1FF86B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeCam", "Assembly-CSharp.csproj", "{9877E467-83A7-5B15-B793-5BCE26C9690E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{9877E467-83A7-5B15-B793-5BCE26C9690E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeCam", "Assembly-CSharp-Editor-firstpass.csproj", "{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeCam", "Assembly-CSharp-Editor.csproj", "{A900D814-5580-A7A7-B8D2-878857CA864C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{A900D814-5580-A7A7-B8D2-878857CA864C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,19 +23,27 @@ Global
 		{9877E467-83A7-5B15-B793-5BCE26C9690E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9877E467-83A7-5B15-B793-5BCE26C9690E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9877E467-83A7-5B15-B793-5BCE26C9690E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A900D814-5580-A7A7-B8D2-878857CA864C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A900D814-5580-A7A7-B8D2-878857CA864C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A900D814-5580-A7A7-B8D2-878857CA864C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A900D814-5580-A7A7-B8D2-878857CA864C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = Mono
+		$1.inheritsScope = text/plain
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal

@@ -3,9 +3,8 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
     <ProjectGuid>{A900D814-5580-A7A7-B8D2-878857CA864C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -34,279 +33,286 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.XML" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine">
-      <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/Managed/UnityEngine.dll</HintPath>
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
-      <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/Managed/UnityEditor.dll</HintPath>
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\InControl\Editor\EditorTextures.cs" />
-     <Compile Include="Assets\InControl\Editor\EditorUtility.cs" />
-     <Compile Include="Assets\InControl\Editor\InControlBuilder.cs" />
-     <Compile Include="Assets\InControl\Editor\InControlInputModuleEditor.cs" />
-     <Compile Include="Assets\InControl\Editor\InControlManagerEditor.cs" />
-     <Compile Include="Assets\InControl\Editor\InputManagerAssetGenerator.cs" />
-     <Compile Include="Assets\InControl\Editor\NativeProfileListGenerator.cs" />
-     <Compile Include="Assets\InControl\Editor\ProfileListGenerator.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\GenericListAdaptor.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\IReorderableListAdaptor.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\Internal\GUIHelper.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\Internal\ReorderableListResources.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\ReorderableListControl.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\ReorderableListFlags.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\ReorderableListGUI.cs" />
-     <Compile Include="Assets\InControl\Editor\ReorderableList\SerializedPropertyAdaptor.cs" />
-     <Compile Include="Assets\InControl\Editor\UnityProfileListGenerator.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\ICadePostProcessor.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Elements.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Lexer.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Objects.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Parser.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Sections.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Serializer.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Utils.cs" />
-     <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBXProject.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchBuilder.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchButtonControlEditor.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchControlEditor.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchManagerEditor.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchStickControlEditor.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchSwipeControlEditor.cs" />
-     <Compile Include="Assets\InControl\Source\Touch\Editor\TouchTrackControlEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Attributes\PostProcessingModelEditorAttribute.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\AmbientOcclusionModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\AntialiasingModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\BloomModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\BuiltinDebugViewsEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\ChromaticAberrationEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\ColorGradingModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\DefaultPostFxModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\DepthOfFieldModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\DitheringModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\EyeAdaptationModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\FogModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\GrainModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\MotionBlurModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\ScreenSpaceReflectionModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\UserLutModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Models\VignetteModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Monitors\HistogramMonitor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Monitors\ParadeMonitor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Monitors\VectorscopeMonitor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Monitors\WaveformMonitor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PostProcessingBehaviourEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PostProcessingFactory.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PostProcessingInspector.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PostProcessingModelEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PostProcessingMonitor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PropertyDrawers\GetSetDrawer.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PropertyDrawers\MinDrawer.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\PropertyDrawers\TrackballGroupDrawer.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Utils\CurveEditor.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Utils\EditorGUIHelper.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Utils\EditorResources.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Utils\FxStyles.cs" />
-     <Compile Include="Assets\PostProcessing\Editor\Utils\ReflectionUtils.cs" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.shader" />
-     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\SunShaftsComposite.shader" />
-     <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
-     <None Include="Assets\TextMesh Pro\Fonts\Anton OFL.txt" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\MotionBlur.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Fog.shader" />
-     <None Include="Assets\Standard Assets\Effects\AntiAliasing\FXAA\Resources\FXAA3.cginc" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\ParadeRender.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\LutGen.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\HistogramRender.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
-     <None Include="Assets\PostProcessing\Editor Resources\UI\CurveBackground.shader" />
-     <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularSmooth.shader" />
-     <None Include="Assets\Standard Assets\Effects\Projectors\Guidelines.txt" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\ScreenSpaceReflection.shader" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\SimpleClear.shader" />
-     <None Include="Assets\Standard Assets\Effects\ScreenSpaceReflection\Resources\ScreenSpaceReflection.shader" />
-     <None Include="Assets\PostProcessing\Utilities\CustomMotionTexture\Shaders\CustomMotionVectorTexture.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\ACES.cginc" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
-     <None Include="Assets\InControl\Readme\README.txt" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\UberSecondPass.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Tonemapping.cginc" />
-     <None Include="Assets\Standard Assets\Effects\ImageEffects\Readme.txt" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\HistogramCompute.compute" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Uber.shader" />
-     <None Include="Assets\Standard Assets\Vehicles\Car\Shaders\DiffuseReflectiveShader.shader" />
-     <None Include="Assets\Standard Assets\Effects\AmbientOcclusion\Resources\AmbientOcclusion.cginc" />
-     <None Include="Assets\Standard Assets\Effects\DepthOfField\Resources\DepthOfField.shader" />
-     <None Include="Assets\Standard Assets\Effects\ScreenSpaceReflection\Resources\ScreenSpaceRaytrace.cginc" />
-     <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Simple.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Blit.shader" />
-     <None Include="Assets\Standard Assets\Vehicles\Aircraft\AircraftGuidelines.txt" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\WaveformRender.shader" />
-     <None Include="Assets\Standard Assets\Effects\AmbientOcclusion\Resources\AmbientOcclusion.shader" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\VectorscopeCompute.compute" />
-     <None Include="Assets\Standard Assets\Effects\AntiAliasing\FXAA\Resources\FXAA.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\FXAA3.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\MotionBlur.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\AmbientOcclusion.shader" />
-     <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\HistogramRender.shader" />
-     <None Include="Assets\Standard Assets\Vehicles\Car\Shaders\ReflectiveDiffuseSpecTransp.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
-     <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\TonemappingColorGrading.cginc" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
-     <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAlpha.shader" />
-     <None Include="Assets\PostProcessing\Resources\Bluenoise64\LICENSE.txt" />
-     <None Include="Assets\Standard Assets\Vehicles\Car\Shaders\ReflectiveDiffuseSpec.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\BuiltinDebugViews.shader" />
-     <None Include="Assets\TextMesh Pro\Fonts\Oswald-Bold - OFL.txt" />
-     <None Include="Assets\Standard Assets\Effects\AntiAliasing\SMAA\Resources\SMAA.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
-     <None Include="Assets\Standard Assets\ParticleSystems\ParticleSystemsGuidelines.txt" />
-     <None Include="Assets\Standard Assets\Effects\Bloom\Resources\Bloom.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Common.cginc" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
-     <None Include="Assets\PostProcessing\Resources\Bluenoise64\COPYING.txt" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
-     <None Include="Assets\Standard Assets\Environment\Water (Basic)\Shaders\FXWaterBasic.shader" />
-     <None Include="Assets\Standard Assets\Fonts\OpenSans\License!.txt" />
-     <None Include="Assets\PostProcessing\Editor Resources\UI\Trackball.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
-     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
-     <None Include="Assets\Standard Assets\Effects\AntiAliasing\SMAA\Resources\SMAA.cginc" />
-     <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAddSoft.shader" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
-     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
-     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Bloom.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\TAA.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\EyeHistogram.compute" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\TAA.cginc" />
-     <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorLight.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\EyeAdaptation.cginc" />
-     <None Include="Assets\Standard Assets\Environment\Water\Water\Shaders\FXWaterPro.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\GrainGen.shader" />
-     <None Include="Assets\TextMesh Pro\Fonts\Bangers - OFL.txt" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\FXAA.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\DiskKernels.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.cginc" />
-     <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\TonemappingColorGrading.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\ScreenSpaceRaytrace.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\Bloom.shader" />
-     <None Include="Assets\Standard Assets\Vehicles\Car\CarGuidelines.txt" />
-     <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorMultiply.shader" />
-     <None Include="Assets\Standard Assets\Characters\ThirdPersonCharacter\ThirdPersonCharacterGuidelines.txt" />
-     <None Include="Assets\Standard Assets\Effects\Bloom\Resources\Bloom.cginc" />
-     <None Include="Assets\Standard Assets\Effects\DepthOfField\Resources\MedianFilter.shader" />
-     <None Include="Assets\Standard Assets\Cameras\CameraGuidelines.txt" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\VectorscopeRender.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\EyeAdaptation.shader" />
-     <None Include="Assets\Standard Assets\Effects\DepthOfField\Resources\BokehSplatting.shader" />
-     <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
-     <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\WaterInclude.cginc" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\ColorGrading.cginc" />
-     <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Advanced.shader" />
-     <None Include="Assets\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
-     <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
-     <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularDisplacement.shader" />
-     <None Include="Assets\PostProcessing\Resources\Shaders\AmbientOcclusion.cginc" />
-     <None Include="Assets\Standard Assets\Effects\LensAberrations\Resources\LensAberrations.shader" />
-     <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\HistogramCompute.compute" />
-     <None Include="Assets\PostProcessing\Editor Resources\Monitors\WaveformCompute.compute" />
-     <None Include="Assets\SampleScenes\Shaders\Skybox-Procedural.shader" />
- <Reference Include="UnityEditor.Advertisements">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/Advertisements/Editor/UnityEditor.Advertisements.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.UI">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/GUISystem/Editor/UnityEditor.UI.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Networking">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.Networking">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/Networking/Editor/UnityEditor.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.TestRunner">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/TestRunner/Editor/UnityEditor.TestRunner.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.TestRunner">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/TestRunner/UnityEngine.TestRunner.dll</HintPath>
- </Reference>
- <Reference Include="nunit.framework">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/TestRunner/nunit.framework.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.TreeEditor">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/TreeEditor/Editor/UnityEditor.TreeEditor.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.Analytics">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityAnalytics/Editor/UnityEditor.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.HoloLens">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityHoloLens/Editor/UnityEditor.HoloLens.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.HoloLens">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.Purchasing">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityPurchasing/Editor/UnityEditor.Purchasing.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.VR">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.VR">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.Graphs">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/Managed/UnityEditor.Graphs.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.Android.Extensions">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.WebGL.Extensions">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.LinuxStandalone.Extensions">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.WindowsStandalone.Extensions">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.OSXStandalone.Extensions">
- <HintPath>C:/Program Files/Unity5.6.0f3/Editor/Data/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
- </Reference>
- <Reference Include="TextMeshPro-1.0.55.56.0b9">
- <HintPath>C:/Users/Aspa/Desktop/FreeCam/FreeCam/FreeCam/Assets/TextMesh Pro/Plugins/TextMeshPro-1.0.55.56.0b9.dll</HintPath>
- </Reference>
- <Reference Include="TextMeshPro-1.0.55.56.0b9-Editor">
- <HintPath>C:/Users/Aspa/Desktop/FreeCam/FreeCam/FreeCam/Assets/TextMesh Pro/Plugins/Editor/TextMeshPro-1.0.55.56.0b9-Editor.dll</HintPath>
- </Reference>
+    <Compile Include="Assets\InControl\Editor\EditorTextures.cs" />
+    <Compile Include="Assets\InControl\Editor\EditorUtility.cs" />
+    <Compile Include="Assets\InControl\Editor\InControlBuilder.cs" />
+    <Compile Include="Assets\InControl\Editor\InControlInputModuleEditor.cs" />
+    <Compile Include="Assets\InControl\Editor\InControlManagerEditor.cs" />
+    <Compile Include="Assets\InControl\Editor\InputManagerAssetGenerator.cs" />
+    <Compile Include="Assets\InControl\Editor\NativeProfileListGenerator.cs" />
+    <Compile Include="Assets\InControl\Editor\ProfileListGenerator.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\GenericListAdaptor.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\IReorderableListAdaptor.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\Internal\GUIHelper.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\Internal\ReorderableListResources.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\ReorderableListControl.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\ReorderableListFlags.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\ReorderableListGUI.cs" />
+    <Compile Include="Assets\InControl\Editor\ReorderableList\SerializedPropertyAdaptor.cs" />
+    <Compile Include="Assets\InControl\Editor\UnityProfileListGenerator.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\ICadePostProcessor.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Elements.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Lexer.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Objects.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Parser.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Sections.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Serializer.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBX\Utils.cs" />
+    <Compile Include="Assets\InControl\Editor\iOS\XCodeAPI\PBXProject.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchBuilder.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchButtonControlEditor.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchControlEditor.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchManagerEditor.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchStickControlEditor.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchSwipeControlEditor.cs" />
+    <Compile Include="Assets\InControl\Source\Touch\Editor\TouchTrackControlEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Attributes\PostProcessingModelEditorAttribute.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\AmbientOcclusionModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\AntialiasingModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\BloomModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\BuiltinDebugViewsEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\ChromaticAberrationEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\ColorGradingModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\DefaultPostFxModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\DepthOfFieldModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\DitheringModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\EyeAdaptationModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\FogModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\GrainModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\MotionBlurModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\ScreenSpaceReflectionModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\UserLutModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Models\VignetteModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Monitors\HistogramMonitor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Monitors\ParadeMonitor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Monitors\VectorscopeMonitor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Monitors\WaveformMonitor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PostProcessingBehaviourEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PostProcessingFactory.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PostProcessingInspector.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PostProcessingModelEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PostProcessingMonitor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PropertyDrawers\GetSetDrawer.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PropertyDrawers\MinDrawer.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\PropertyDrawers\TrackballGroupDrawer.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Utils\CurveEditor.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Utils\EditorGUIHelper.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Utils\EditorResources.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Utils\FxStyles.cs" />
+    <Compile Include="Assets\PostProcessing\Editor\Utils\ReflectionUtils.cs" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.shader" />
+    <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\SunShaftsComposite.shader" />
+    <None Include="Assets\Standard Assets\Prototyping\Shaders\WorldCoordDiffuse.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\Anton OFL.txt" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\MotionBlur.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Fog.shader" />
+    <None Include="Assets\Standard Assets\Effects\AntiAliasing\FXAA\Resources\FXAA3.cginc" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\ParadeRender.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\LutGen.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\HistogramRender.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\PostProcessing\Editor Resources\UI\CurveBackground.shader" />
+    <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularSmooth.shader" />
+    <None Include="Assets\Standard Assets\Effects\Projectors\Guidelines.txt" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\ScreenSpaceReflection.shader" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\SimpleClear.shader" />
+    <None Include="Assets\Scripts\Lens.shader" />
+    <None Include="Assets\Standard Assets\Effects\ScreenSpaceReflection\Resources\ScreenSpaceReflection.shader" />
+    <None Include="Assets\PostProcessing\Utilities\CustomMotionTexture\Shaders\CustomMotionVectorTexture.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\ACES.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\InControl\Readme\README.txt" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\UberSecondPass.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Tonemapping.cginc" />
+    <None Include="Assets\Standard Assets\Effects\ImageEffects\Readme.txt" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\HistogramCompute.compute" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Uber.shader" />
+    <None Include="Assets\Standard Assets\Vehicles\Car\Shaders\DiffuseReflectiveShader.shader" />
+    <None Include="Assets\Standard Assets\Effects\AmbientOcclusion\Resources\AmbientOcclusion.cginc" />
+    <None Include="Assets\Standard Assets\Effects\DepthOfField\Resources\DepthOfField.shader" />
+    <None Include="Assets\Standard Assets\Effects\ScreenSpaceReflection\Resources\ScreenSpaceRaytrace.cginc" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Simple.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Blit.shader" />
+    <None Include="Assets\Standard Assets\Vehicles\Aircraft\AircraftGuidelines.txt" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\WaveformRender.shader" />
+    <None Include="Assets\Standard Assets\Effects\AmbientOcclusion\Resources\AmbientOcclusion.shader" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\VectorscopeCompute.compute" />
+    <None Include="Assets\Standard Assets\Effects\AntiAliasing\FXAA\Resources\FXAA.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\FXAA3.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\MotionBlur.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\AmbientOcclusion.shader" />
+    <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\HistogramRender.shader" />
+    <None Include="Assets\Standard Assets\Vehicles\Car\Shaders\ReflectiveDiffuseSpecTransp.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
+    <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\TonemappingColorGrading.cginc" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
+    <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAlpha.shader" />
+    <None Include="Assets\PostProcessing\Resources\Bluenoise64\LICENSE.txt" />
+    <None Include="Assets\Standard Assets\Vehicles\Car\Shaders\ReflectiveDiffuseSpec.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\BuiltinDebugViews.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\Oswald-Bold - OFL.txt" />
+    <None Include="Assets\Standard Assets\Effects\AntiAliasing\SMAA\Resources\SMAA.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\Standard Assets\ParticleSystems\ParticleSystemsGuidelines.txt" />
+    <None Include="Assets\Standard Assets\Effects\Bloom\Resources\Bloom.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Common.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\PostProcessing\Resources\Bluenoise64\COPYING.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\Standard Assets\Fonts\OpenSans\License!.txt" />
+    <None Include="Assets\PostProcessing\Editor Resources\UI\Trackball.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
+    <None Include="Assets\Standard Assets\Effects\AntiAliasing\SMAA\Resources\SMAA.cginc" />
+    <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAddSoft.shader" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Bloom.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\TAA.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\EyeHistogram.compute" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\TAA.cginc" />
+    <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorLight.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\EyeAdaptation.cginc" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water\Shaders\FXWaterPro.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\GrainGen.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\Bangers - OFL.txt" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\FXAA.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\DiskKernels.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\DepthOfField.cginc" />
+    <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\TonemappingColorGrading.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\ScreenSpaceRaytrace.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\Bloom.shader" />
+    <None Include="Assets\Standard Assets\Vehicles\Car\CarGuidelines.txt" />
+    <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorMultiply.shader" />
+    <None Include="Assets\Standard Assets\Characters\ThirdPersonCharacter\ThirdPersonCharacterGuidelines.txt" />
+    <None Include="Assets\Standard Assets\Effects\Bloom\Resources\Bloom.cginc" />
+    <None Include="Assets\Standard Assets\Effects\DepthOfField\Resources\MedianFilter.shader" />
+    <None Include="Assets\Standard Assets\Cameras\CameraGuidelines.txt" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\VectorscopeRender.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\EyeAdaptation.shader" />
+    <None Include="Assets\Standard Assets\Effects\DepthOfField\Resources\BokehSplatting.shader" />
+    <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\WaterInclude.cginc" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\ColorGrading.cginc" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Advanced.shader" />
+    <None Include="Assets\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
+    <None Include="Assets\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
+    <None Include="Assets\Standard Assets\Effects\TessellationShaders\Shaders\BumpedSpecularDisplacement.shader" />
+    <None Include="Assets\PostProcessing\Resources\Shaders\AmbientOcclusion.cginc" />
+    <None Include="Assets\Standard Assets\Effects\LensAberrations\Resources\LensAberrations.shader" />
+    <None Include="Assets\Standard Assets\Effects\TonemappingColorGrading\Resources\HistogramCompute.compute" />
+    <None Include="Assets\PostProcessing\Editor Resources\Monitors\WaveformCompute.compute" />
+    <None Include="Assets\SampleScenes\Shaders\Skybox-Procedural.shader" />
+    <Reference Include="UnityEditor.Advertisements">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\Advertisements\Editor\UnityEditor.Advertisements.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UI">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\GUISystem\Editor\UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\Networking\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Networking">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\Networking\Editor\UnityEditor.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TestRunner">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\TestRunner\Editor\UnityEditor.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TestRunner">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\TestRunner\UnityEngine.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\TestRunner\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TreeEditor">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\TreeEditor\Editor\UnityEditor.TreeEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Analytics">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityAnalytics\UnityEngine.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Analytics">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityAnalytics\Editor\UnityEditor.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.HoloLens">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityHoloLens\Editor\UnityEditor.HoloLens.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HoloLens">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityHoloLens\RuntimeEditor\UnityEngine.HoloLens.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Purchasing">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityPurchasing\Editor\UnityEditor.Purchasing.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.VR">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityVR\Editor\UnityEditor.VR.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VR">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\UnityExtensions\Unity\UnityVR\RuntimeEditor\UnityEngine.VR.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Graphs">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\PlaybackEngines\AndroidPlayer\UnityEditor.Android.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WebGL.Extensions">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\PlaybackEngines\WebGLSupport\UnityEditor.WebGL.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.LinuxStandalone.Extensions">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\PlaybackEngines\LinuxStandaloneSupport\UnityEditor.LinuxStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\PlaybackEngines\windowsstandalonesupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.OSXStandalone.Extensions">
+      <HintPath>C:\Program Files\Unity5.6.0f3\Editor\Data\PlaybackEngines\MacStandaloneSupport\UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="TextMeshPro-1.0.55.56.0b9">
+      <HintPath>C:\Users\Aspa\Desktop\FreeCam\FreeCam\FreeCam\Assets\TextMesh Pro\Plugins\TextMeshPro-1.0.55.56.0b9.dll</HintPath>
+    </Reference>
+    <Reference Include="TextMeshPro-1.0.55.56.0b9-Editor">
+      <HintPath>C:\Users\Aspa\Desktop\FreeCam\FreeCam\FreeCam\Assets\TextMesh Pro\Plugins\Editor\TextMeshPro-1.0.55.56.0b9-Editor.dll</HintPath>
+    </Reference>
+    <None Include="Assets\Standard Assets\Environment\Water %28Basic%29\Shaders\FXWaterBasic.shader" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{490CA2CE-4F70-E798-53A2-E4A37B1FF86B}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+      <Project>{490CA2CE-4F70-E798-53A2-E4A37B1FF86B}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{9877E467-83A7-5B15-B793-5BCE26C9690E}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+      <Project>{9877E467-83A7-5B15-B793-5BCE26C9690E}</Project>
+      <Name>Assembly-CSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="Assembly-CSharp-Editor-firstpass.csproj">
-      <Project>{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}</Project>      <Name>Assembly-CSharp-Editor-firstpass</Name>    </ProjectReference>
+      <Project>{EEC2A267-9900-62C2-0E64-BE987ECE9D8B}</Project>
+      <Name>Assembly-CSharp-Editor-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -316,5 +322,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  
 </Project>

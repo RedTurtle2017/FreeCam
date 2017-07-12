@@ -135,8 +135,9 @@ public class PlayerController : MonoBehaviour
 	public Animator TauntText;
 	public TextMeshProUGUI TauntTextString;
 	public string[] Taunts;
-
 	public GameObject RespawnUI;
+
+	public Animator[] LifeAnims;
 
 	[Header ("Respawn")]
 	public GameObject[] SpawnPoints;
@@ -147,51 +148,64 @@ public class PlayerController : MonoBehaviour
 	public PostProcessingProfile MainPostProcess;
 	public PostProcessingProfile OverPostProcess;
 
+	[Header ("Misc")]
+	public bool isMenuPlayer;
+
 	void Start () 
 	{
 		CreateBindings ();
-		SetStartCursorState ();
-		SetStartHealth ();
-		SetStartLives ();
-		CameraPivotFollowScript.target = gameObject.transform;
+	
+		if (isMenuPlayer == false) 
+		{
+			SetStartCursorState ();
+			SetStartHealth ();
+			SetStartLives ();
+			CameraPivotFollowScript.target = gameObject.transform;
+		}
 	}
 
 	void Update ()
 	{
-		CheckPauseState ();
-		CheckHealthAmount ();
-		CheckParticleEngines ();
-		CheckWeaponId ();
-		CheckSpeed ();
-		CheckAudio ();
-		CheckCooldown ();
-		CheckVisuals ();
+		if (isMenuPlayer == false)
+		{
+			CheckPauseState ();
+			CheckHealthAmount ();
+			CheckParticleEngines ();
+			CheckWeaponId ();
+			CheckSpeed ();
+			CheckAudio ();
+			CheckCooldown ();
+			CheckVisuals ();
+		}
 	}
 
 	void FixedUpdate () 
 	{
-		if (isPaused == false)
+		if (isMenuPlayer == false)
 		{
-			if (playerActions.Shoot.Value > 0.1f) 
+			if (isPaused == false)
 			{
-				if (CurrentHealth > 0)
+				if (playerActions.Shoot.Value > 0.1f) 
 				{
-					Shoot ();
-				}
-
-				if (CurrentHealth <= 0) 
-				{
-					if (RespawnUI.activeSelf == true) 
+					if (CurrentHealth > 0) 
 					{
-						RespawnPlayerNow ();
+						Shoot ();
+					}
+
+					if (CurrentHealth <= 0) 
+					{
+						if (RespawnUI.activeSelf == true) 
+						{
+							RespawnPlayerNow ();
+						}
 					}
 				}
+
+				MovePlayer ();
 			}
 
-			MovePlayer ();
+			ClampVelocity ();
 		}
-
-		ClampVelocity ();
 	}
 
 	void LateUpdate ()
@@ -278,7 +292,7 @@ public class PlayerController : MonoBehaviour
 			// Moving
 			rb.AddRelativeForce 
 			(
-				playerActions.Move.Value.x * Force.x, 
+				Mathf.Clamp ((playerActions.Move.Value.x), -1, 1) * Force.x, 
 				playerActions.Elevate.Value * Force.y, 
 				playerActions.Move.Value.y * Force.z, ForceMode.Force
 			);
@@ -288,7 +302,7 @@ public class PlayerController : MonoBehaviour
 			(
 				0, 
 				0, 
-				playerActions.Roll.Value * -4 * RollSpeed, ForceMode.Acceleration
+				playerActions.Roll.Value * RollSpeed * -4, ForceMode.Force
 			);
 
 			// Looking
@@ -304,8 +318,7 @@ public class PlayerController : MonoBehaviour
 				Vector3 RotateHorizontal = Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 4;
 
 				PlayerRotation.transform.Rotate (RotateVertical);
-				PlayerRotation.transform.Rotate (RotateHorizontal);
-			
+				PlayerRotation.transform.Rotate (RotateHorizontal);			
 			}
 		}
 
@@ -421,7 +434,7 @@ public class PlayerController : MonoBehaviour
 		if (Died == false) 
 		{
 			SpeedOmeterImage.fillAmount = (rb.velocity.magnitude * 0.75f) / MaxVelocity;
-			SpeedText.text = "" + Mathf.Round (rb.velocity.magnitude) * 10;
+			SpeedText.text = "" + Mathf.Round (rb.velocity.magnitude * 2);
 		}
 	}
 
@@ -767,6 +780,7 @@ public class PlayerController : MonoBehaviour
 		rb.velocity = Vector3.zero;
 		TauntTextString.text = Taunts [Random.Range (0, Taunts.Length)];
 		TauntText.Play ("TauntText");
+		LifeAnims [LivesLeft - 1].Play ("LifeExit");
 		yield return new WaitForSecondsRealtime (1);
 		CurrentHealth = 1;
 		LivesLeft -= 1;
