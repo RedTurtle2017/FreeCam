@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
 	public Transform ShotSpawnL;
 	public Transform ShotSpawnR;
 	public bool usePrimaryBarrel;
+	public bool Overheated;
 
 	public int WeaponId;
 	public int MaxWeapons = 8;
@@ -201,6 +202,21 @@ public class PlayerController : MonoBehaviour
 					}
 				}
 
+				if (Overheated == false) 
+				{
+					
+				}
+
+				if (Overheated == true)
+				{
+					CooldownTime -= AddCooldownTime [WeaponId - 1] * Time.deltaTime;
+
+					if (CoolDownImage.fillAmount < 0.75f)
+					{
+						Overheated = false;
+					}
+				}
+
 				MovePlayer ();
 			}
 
@@ -294,7 +310,7 @@ public class PlayerController : MonoBehaviour
 			(
 				Mathf.Clamp ((playerActions.Move.Value.x), -1, 1) * Force.x, 
 				playerActions.Elevate.Value * Force.y, 
-				playerActions.Move.Value.y * Force.z, ForceMode.Force
+				playerActions.Move.Value.y * Force.z, ForceMode.Acceleration
 			);
 
 			// Rolling
@@ -320,6 +336,8 @@ public class PlayerController : MonoBehaviour
 				PlayerRotation.transform.Rotate (RotateVertical);
 				PlayerRotation.transform.Rotate (RotateHorizontal);			
 			}
+
+			//rb.velocity += transform.forward * playerActions.Move.Value.y;
 		}
 
 		if (CurrentHealth <= 0) 
@@ -337,18 +355,19 @@ public class PlayerController : MonoBehaviour
 
 	void ClampVelocity ()
 	{
-		/*
+		
 		// Clamps via velocity.
-		rb.velocity = new Vector3 
-			(
-				Mathf.Clamp (rb.velocity.x, -MaxVelocity, MaxVelocity),
-				Mathf.Clamp (rb.velocity.y, -MaxVelocity, MaxVelocity), 
-				Mathf.Clamp (rb.velocity.z, -MaxVelocity, MaxVelocity)
-			);*/
+		/*rb.velocity = new Vector3 (
+			Mathf.Clamp (rb.velocity.x, -MaxVelocity, MaxVelocity),
+			Mathf.Clamp (rb.velocity.y, -MaxVelocity, MaxVelocity), 
+			Mathf.Clamp (rb.velocity.z, -MaxVelocity, MaxVelocity)
+		);*/
+
+		rb.velocity = Vector3.ClampMagnitude (rb.velocity, MaxVelocity);
 
 		// Clamps with new method.
 
-		if (rb.velocity.sqrMagnitude > (MaxVelocity * MaxVelocity)) 
+		/*if (rb.velocity.sqrMagnitude > (MaxVelocity * MaxVelocity)) 
 		{
 			rb.velocity = rb.velocity.normalized * MaxVelocity;
 		}
@@ -356,39 +375,47 @@ public class PlayerController : MonoBehaviour
 		if (rb.velocity.sqrMagnitude < 0) 
 		{
 			rb.velocity = rb.velocity.normalized;
-		}
+		}*/
 	}
 		
 	void Shoot ()
 	{
-		if (Time.time > nextFire)
+		if (Overheated == false) 
 		{
-			if (WeaponId == 1) 
+			if (Time.time > nextFire)
 			{
-				usePrimaryBarrel = !usePrimaryBarrel;
-
-				if (usePrimaryBarrel)
+				if (WeaponId == 1) 
 				{
-					Instantiate (Shot, ShotSpawnL.position, ShotSpawnL.rotation);
+					usePrimaryBarrel = !usePrimaryBarrel;
+
+					if (usePrimaryBarrel)
+					{
+						Instantiate (Shot, ShotSpawnL.position, ShotSpawnL.rotation);
+					}
+
+					if (!usePrimaryBarrel)
+					{
+						Instantiate (Shot, ShotSpawnR.position, ShotSpawnR.rotation);
+					}
 				}
 
-				if (!usePrimaryBarrel) 
+				if (CoolDownImage.fillAmount < 0.99f) 
 				{
-					Instantiate (Shot, ShotSpawnR.position, ShotSpawnR.rotation);
+					CooldownTime += 0.25f * AddCooldownTime [WeaponId - 1];
+					nextFire = Time.time + FireRate;
+				}
+
+				if (CoolDownImage.fillAmount > 0.99f) 
+				{
+					nextFire = Time.time + FireRate * 2;
+					Overheated = true;
 				}
 			}
+		}
 
-			if (CoolDownImage.fillAmount < 0.99f) 
-			{
-				nextFire = Time.time + FireRate;
-			}
+		if (Overheated == true) 
+		{
 
-			if (CoolDownImage.fillAmount > 0.9f) 
-			{
-				nextFire = Time.time + FireRate * 2;
-			}
-
-			CooldownTime += AddCooldownTime [WeaponId - 1];
 		}
 	}
 
@@ -500,8 +527,10 @@ public class PlayerController : MonoBehaviour
 
 		MainPostProcess.chromaticAberration.settings = ChromaticAbberationSettings;
 
-		Camera.main.fieldOfView = Mathf.Clamp (0.4375f * rb.velocity.magnitude + 30, 30, 100);
+		Camera.main.fieldOfView = Mathf.Clamp (0.43333333f * rb.velocity.magnitude + 45, 45, 110);
 		//Camera.main.fieldOfView = Mathf.Clamp (-0.5625f * rb.velocity.magnitude + 120, 30, 120);
+
+		//Debug.Log ("Current velocity magnitude = " + rb.velocity.magnitude);
 	}
 
 	void CheckHealthAmount ()
@@ -811,369 +840,333 @@ public class PlayerController : MonoBehaviour
 
 	void CheckWeaponId ()
 	{
-		if (playerActions.NextWeapon.Value > 0) 
-		{
-			WeaponId += 1;
-			WeaponWheel.Play ("WeaponWheelOn", -1, 0);
-
-			if (canUseWeapon1 == false) 
-			{
-				WeaponIcon1.SetActive (false);
-			}
-
-			if (canUseWeapon2 == false) 
-			{
-				WeaponIcon2.SetActive (false);
-			}
-
-			if (canUseWeapon3 == false) 
-			{
-				WeaponIcon3.SetActive (false);
-			}
-
-			if (canUseWeapon4 == false) 
-			{
-				WeaponIcon4.SetActive (false);
-			}
-
-			if (canUseWeapon5 == false) 
-			{
-				WeaponIcon5.SetActive (false);
-			}
-
-			if (canUseWeapon6 == false) 
-			{
-				WeaponIcon6.SetActive (false);
-			}
-
-			if (canUseWeapon7 == false) 
-			{
-				WeaponIcon7.SetActive (false);
-			}
-
-			if (canUseWeapon8 == false) 
-			{
-				WeaponIcon8.SetActive (false);
-			}
-				
-			if (WeaponId > MaxWeapons) 
-			{
-				WeaponId = 1;
-			}
-
-			if (canUseWeapon1 == true) 
-			{
-				WeaponIcon1.SetActive (true);
-			}
-
-			if (canUseWeapon2 == true) 
-			{
-				WeaponIcon2.SetActive (true);
-			}
-
-			if (canUseWeapon3 == true) 
-			{
-				WeaponIcon3.SetActive (true);
-			}
-
-			if (canUseWeapon4 == true) 
-			{
-				WeaponIcon4.SetActive (true);
-			}
-
-			if (canUseWeapon5 == true) 
-			{
-				WeaponIcon5.SetActive (true);
-			}
-
-			if (canUseWeapon6 == true) 
-			{
-				WeaponIcon6.SetActive (true);
-			}
-
-			if (canUseWeapon7 == true) 
-			{
-				WeaponIcon7.SetActive (true);
-			}
-
-			if (canUseWeapon8 == true) 
-			{
-				WeaponIcon8.SetActive (true);
-			}
-
-			switch (WeaponId) {
-			case 1:
-				WeaponWheelIcon1.color = Color.white;
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 2:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = Color.white;
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 3:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = Color.white;
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 4:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = Color.white;
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 5:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = Color.white;
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 6:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = Color.white;
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 7:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = Color.white;
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
-
-			case 8:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = Color.white;
-				break;
-			}
-		}
-
-		if (playerActions.PreviousWeapon.Value > 0) 
-		{
-			if (WeaponId > 0) 
-			{
-				WeaponId -= 1;
+		if (isPaused == false) {
+			if (playerActions.NextWeapon.Value > 0) {
+				WeaponId += 1;
 				WeaponWheel.Play ("WeaponWheelOn", -1, 0);
-			}
 
-			if (WeaponId <= 0) 
-			{
-				WeaponId = MaxWeapons;
-			}
+				if (canUseWeapon1 == false) {
+					WeaponIcon1.SetActive (false);
+				}
 
-			if (canUseWeapon1 == false) 
-			{
-				WeaponIcon1.SetActive (false);
-			}
+				if (canUseWeapon2 == false) {
+					WeaponIcon2.SetActive (false);
+				}
 
-			if (canUseWeapon2 == false) 
-			{
-				WeaponIcon2.SetActive (false);
-			}
+				if (canUseWeapon3 == false) {
+					WeaponIcon3.SetActive (false);
+				}
 
-			if (canUseWeapon3 == false) 
-			{
-				WeaponIcon3.SetActive (false);
-			}
+				if (canUseWeapon4 == false) {
+					WeaponIcon4.SetActive (false);
+				}
 
-			if (canUseWeapon4 == false) 
-			{
-				WeaponIcon4.SetActive (false);
-			}
+				if (canUseWeapon5 == false) {
+					WeaponIcon5.SetActive (false);
+				}
 
-			if (canUseWeapon5 == false) 
-			{
-				WeaponIcon5.SetActive (false);
-			}
+				if (canUseWeapon6 == false) {
+					WeaponIcon6.SetActive (false);
+				}
 
-			if (canUseWeapon6 == false) 
-			{
-				WeaponIcon6.SetActive (false);
-			}
+				if (canUseWeapon7 == false) {
+					WeaponIcon7.SetActive (false);
+				}
 
-			if (canUseWeapon7 == false) 
-			{
-				WeaponIcon7.SetActive (false);
-			}
-
-			if (canUseWeapon8 == false) 
-			{
-				WeaponIcon8.SetActive (false);
-			}
+				if (canUseWeapon8 == false) {
+					WeaponIcon8.SetActive (false);
+				}
 				
-			if (canUseWeapon1 == true) 
-			{
-				WeaponIcon1.SetActive (true);
+				if (WeaponId > MaxWeapons) {
+					WeaponId = 1;
+				}
+
+				if (canUseWeapon1 == true) {
+					WeaponIcon1.SetActive (true);
+				}
+
+				if (canUseWeapon2 == true) {
+					WeaponIcon2.SetActive (true);
+				}
+
+				if (canUseWeapon3 == true) {
+					WeaponIcon3.SetActive (true);
+				}
+
+				if (canUseWeapon4 == true) {
+					WeaponIcon4.SetActive (true);
+				}
+
+				if (canUseWeapon5 == true) {
+					WeaponIcon5.SetActive (true);
+				}
+
+				if (canUseWeapon6 == true) {
+					WeaponIcon6.SetActive (true);
+				}
+
+				if (canUseWeapon7 == true) {
+					WeaponIcon7.SetActive (true);
+				}
+
+				if (canUseWeapon8 == true) {
+					WeaponIcon8.SetActive (true);
+				}
+
+				switch (WeaponId) {
+				case 1:
+					WeaponWheelIcon1.color = Color.white;
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 2:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = Color.white;
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 3:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = Color.white;
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 4:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = Color.white;
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 5:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = Color.white;
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 6:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = Color.white;
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 7:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = Color.white;
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 8:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = Color.white;
+					break;
+				}
 			}
 
-			if (canUseWeapon2 == true) 
-			{
-				WeaponIcon2.SetActive (true);
-			}
+			if (playerActions.PreviousWeapon.Value > 0) {
+				if (WeaponId > 0) {
+					WeaponId -= 1;
+					WeaponWheel.Play ("WeaponWheelOn", -1, 0);
+				}
 
-			if (canUseWeapon3 == true) 
-			{
-				WeaponIcon3.SetActive (true);
-			}
+				if (WeaponId <= 0) {
+					WeaponId = MaxWeapons;
+				}
 
-			if (canUseWeapon4 == true) 
-			{
-				WeaponIcon4.SetActive (true);
-			}
+				if (canUseWeapon1 == false) {
+					WeaponIcon1.SetActive (false);
+				}
 
-			if (canUseWeapon5 == true) 
-			{
-				WeaponIcon5.SetActive (true);
-			}
+				if (canUseWeapon2 == false) {
+					WeaponIcon2.SetActive (false);
+				}
 
-			if (canUseWeapon6 == true) 
-			{
-				WeaponIcon6.SetActive (true);
-			}
+				if (canUseWeapon3 == false) {
+					WeaponIcon3.SetActive (false);
+				}
 
-			if (canUseWeapon7 == true) 
-			{
-				WeaponIcon7.SetActive (true);
-			}
+				if (canUseWeapon4 == false) {
+					WeaponIcon4.SetActive (false);
+				}
 
-			if (canUseWeapon8 == true) 
-			{
-				WeaponIcon8.SetActive (true);
-			}
+				if (canUseWeapon5 == false) {
+					WeaponIcon5.SetActive (false);
+				}
+
+				if (canUseWeapon6 == false) {
+					WeaponIcon6.SetActive (false);
+				}
+
+				if (canUseWeapon7 == false) {
+					WeaponIcon7.SetActive (false);
+				}
+
+				if (canUseWeapon8 == false) {
+					WeaponIcon8.SetActive (false);
+				}
 				
-			switch (WeaponId) 
-			{
-			case 1:
-				WeaponWheelIcon1.color = Color.white;
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon1 == true) {
+					WeaponIcon1.SetActive (true);
+				}
 
-			case 2:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = Color.white;
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon2 == true) {
+					WeaponIcon2.SetActive (true);
+				}
 
-			case 3:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = Color.white;
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon3 == true) {
+					WeaponIcon3.SetActive (true);
+				}
 
-			case 4:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = Color.white;
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon4 == true) {
+					WeaponIcon4.SetActive (true);
+				}
 
-			case 5:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = Color.white;
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon5 == true) {
+					WeaponIcon5.SetActive (true);
+				}
 
-			case 6:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = Color.white;
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon6 == true) {
+					WeaponIcon6.SetActive (true);
+				}
 
-			case 7:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = Color.white;
-				WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				break;
+				if (canUseWeapon7 == true) {
+					WeaponIcon7.SetActive (true);
+				}
 
-			case 8:
-				WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
-				WeaponWheelIcon8.color = Color.white;
-				break;
+				if (canUseWeapon8 == true) {
+					WeaponIcon8.SetActive (true);
+				}
+				
+				switch (WeaponId) {
+				case 1:
+					WeaponWheelIcon1.color = Color.white;
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 2:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = Color.white;
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 3:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = Color.white;
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 4:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = Color.white;
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 5:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = Color.white;
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 6:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = Color.white;
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 7:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = Color.white;
+					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					break;
+
+				case 8:
+					WeaponWheelIcon1.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon2.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon3.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon4.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon5.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					WeaponWheelIcon8.color = Color.white;
+					break;
+				}
 			}
 		}
 	}

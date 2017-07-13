@@ -9,6 +9,7 @@ public class DiscoAudioVisualizer : MonoBehaviour
 	public PostProcessingProfile postProcessingProfile;
 	public float Smoothing;
 	private float smoothVel;
+	public float addIntenisity;
 
 	void Start () 
 	{
@@ -19,7 +20,7 @@ public class DiscoAudioVisualizer : MonoBehaviour
 	{
 		var BloomSettings = postProcessingProfile.bloom.settings;
 
-		BloomSettings.bloom.intensity = Mathf.SmoothDamp(BloomSettings.bloom.intensity, LoudnessScript.clipLoudness, ref smoothVel, Smoothing * Time.deltaTime);
+		BloomSettings.bloom.intensity = Mathf.SmoothDamp(BloomSettings.bloom.intensity, LoudnessScript.clipLoudness + addIntenisity, ref smoothVel, Smoothing * Time.deltaTime);
 
 		postProcessingProfile.bloom.settings = BloomSettings;
 	}
