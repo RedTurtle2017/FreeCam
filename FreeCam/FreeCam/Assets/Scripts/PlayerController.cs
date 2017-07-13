@@ -137,6 +137,7 @@ public class PlayerController : MonoBehaviour
 	public TextMeshProUGUI TauntTextString;
 	public string[] Taunts;
 	public GameObject RespawnUI;
+	public GameObject MainUI;
 
 	public Animator[] LifeAnims;
 
@@ -148,6 +149,12 @@ public class PlayerController : MonoBehaviour
 	[Header ("Visuals")]
 	public PostProcessingProfile MainPostProcess;
 	public PostProcessingProfile OverPostProcess;
+
+	[Header ("Audio")]
+	public AudioSource SoundtrackBase;
+	public AudioSource SoundtrackLayerOne;
+	public AudioSource SoundtrackLayerTwo;
+	public AudioSource SoundtrackLayerThree;
 
 	[Header ("Misc")]
 	public bool isMenuPlayer;
@@ -401,7 +408,7 @@ public class PlayerController : MonoBehaviour
 
 				if (CoolDownImage.fillAmount < 0.99f) 
 				{
-					CooldownTime += 0.25f * AddCooldownTime [WeaponId - 1];
+					CooldownTime += 0.5f * AddCooldownTime [WeaponId - 1];
 					nextFire = Time.time + FireRate;
 				}
 
@@ -426,17 +433,17 @@ public class PlayerController : MonoBehaviour
 			CoolDownImage.fillAmount = CooldownTime;
 			CooldownTime -= Time.deltaTime * WeaponCooldownTime[WeaponId - 1];
 			CoolDownImage.color = new Color (1, 0, 0, Mathf.Clamp(CooldownTime, 0, 0.7f));
-			CoolDownImage.rectTransform.sizeDelta = new Vector2 (9 * CooldownTime, 9 * CooldownTime);
+			CoolDownImage.rectTransform.sizeDelta = new Vector2 (900 * CooldownTime, 900 * CooldownTime);
 		}
 
 		if (CooldownTime > CooldownThreshold) 
 		{
-			if (CooldownWarning.isPlaying == false) 
+			if (CooldownWarning.isPlaying == false && isPaused == false) 
 			{
 				CooldownWarning.Play ();
 			}
 
-			if (CooldownWarningParticles.isPlaying == false) 
+			if (CooldownWarningParticles.isPlaying == false && isPaused == false) 
 			{
 				CooldownWarningParticles.Play ();
 			}
@@ -502,16 +509,35 @@ public class PlayerController : MonoBehaviour
 			if (isPaused == true) 
 			{
 				gameControllerScript.TargetTimeScale = 0;
-				Cursor.visible = true;
-				Cursor.lockState = CursorLockMode.None;
+
 			}
 
 			if (isPaused == false) 
 			{
 				gameControllerScript.TargetTimeScale = 1;
-				Cursor.visible = false;
-				Cursor.lockState = CursorLockMode.Locked;
 			}
+		}
+
+		if (Time.timeScale < 0.01f) 
+		{
+			Cursor.visible = true;
+			Cursor.lockState = CursorLockMode.None;
+
+			SoundtrackBase.volume = 0;
+			SoundtrackLayerOne.volume = 0;
+			SoundtrackLayerTwo.volume = 0;
+			SoundtrackLayerThree.volume = 0;
+		}
+
+		if (Time.timeScale > 0.01f && SoundtrackBase.volume != 0.5f) 
+		{
+			SoundtrackBase.volume = 0.5f;
+			SoundtrackLayerOne.volume = 0.5f;
+			SoundtrackLayerTwo.volume = 0.5f;
+			SoundtrackLayerThree.volume = 0.5f;
+
+			Cursor.visible = false;
+			Cursor.lockState = CursorLockMode.Locked;
 		}
 	}
 
@@ -815,6 +841,7 @@ public class PlayerController : MonoBehaviour
 		LivesLeft -= 1;
 		yield return new WaitForSecondsRealtime (1);
 		RespawnUI.SetActive (true);
+		MainUI.SetActive (false);
 	}
 
 	public void RespawnPlayerNow ()
@@ -827,6 +854,7 @@ public class PlayerController : MonoBehaviour
 		CameraPivotFollowScript.target = gameObject.transform;
 		TargetHealth = StartingHealth;
 		RespawnUI.SetActive (false);
+		MainUI.SetActive (true);
 		CameraPivotFollowScript.SMOOTH_TIME = 0.02f;
 		MeshObject.SetActive (true);
 		StartCoroutine (EnableShooting ());
