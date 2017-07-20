@@ -17,7 +17,6 @@ public class BulletScript : MonoBehaviour
 		playerRb = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody> ();
 		rb = GetComponent<Rigidbody> ();
 		rb.velocity = transform.forward * speed.z * Time.deltaTime;
-		rb.transform.rotation = Quaternion.LookRotation (rb.velocity);
 	}
 
 	void FixedUpdate ()

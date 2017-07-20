@@ -553,7 +553,7 @@ public class PlayerController : MonoBehaviour
 
 		MainPostProcess.chromaticAberration.settings = ChromaticAbberationSettings;
 
-		Camera.main.fieldOfView = Mathf.Clamp (0.43333333f * rb.velocity.magnitude + 45, 45, 110);
+		Camera.main.fieldOfView = Mathf.Clamp (0.2666666f * rb.velocity.magnitude + 50, 50, 90);
 		//Camera.main.fieldOfView = Mathf.Clamp (-0.5625f * rb.velocity.magnitude + 120, 30, 120);
 
 		//Debug.Log ("Current velocity magnitude = " + rb.velocity.magnitude);

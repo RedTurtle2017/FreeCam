@@ -247,14 +247,14 @@
  <Reference Include="UnityEditor.OSXStandalone.Extensions">
  <HintPath>E:/Program Files/Unity 5.6.0f3/Editor/Data/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="NAudio">
+ <HintPath>E:/Repository/FreeCam/FreeCam/FreeCam/Assets/Plugins/NAudio.dll</HintPath>
+ </Reference>
  <Reference Include="TextMeshPro-1.0.55.56.0b9">
  <HintPath>E:/Repository/FreeCam/FreeCam/FreeCam/Assets/TextMesh Pro/Plugins/TextMeshPro-1.0.55.56.0b9.dll</HintPath>
  </Reference>
  <Reference Include="TextMeshPro-1.0.55.56.0b9-Editor">
  <HintPath>E:/Repository/FreeCam/FreeCam/FreeCam/Assets/TextMesh Pro/Plugins/Editor/TextMeshPro-1.0.55.56.0b9-Editor.dll</HintPath>
- </Reference>
- <Reference Include="NAudio">
- <HintPath>E:/Repository/FreeCam/FreeCam/FreeCam/Assets/Plugins/NAudio.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
