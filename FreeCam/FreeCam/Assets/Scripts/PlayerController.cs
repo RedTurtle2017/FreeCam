@@ -258,20 +258,20 @@ public class PlayerController : MonoBehaviour
 		playerActions.MoveUp.AddDefaultBinding (Key.Space);
 		playerActions.MoveUp.AddDefaultBinding (InputControlType.Action1);
 
-		playerActions.MoveDown.AddDefaultBinding (Key.C);
+		playerActions.MoveDown.AddDefaultBinding (Key.LeftControl);
 		playerActions.MoveDown.AddDefaultBinding (InputControlType.Action4);
 
 		playerActions.RollLeft.AddDefaultBinding (Key.Q);
-		playerActions.RollLeft.AddDefaultBinding (InputControlType.Action3);
+		playerActions.RollLeft.AddDefaultBinding (InputControlType.LeftBumper);
 
 		playerActions.RollRight.AddDefaultBinding (Key.E);
-		playerActions.RollRight.AddDefaultBinding (InputControlType.Action4);
+		playerActions.RollRight.AddDefaultBinding (InputControlType.RightBumper);
 
 		playerActions.NextWeapon.AddDefaultBinding (Mouse.PositiveScrollWheel);
-		playerActions.NextWeapon.AddDefaultBinding (InputControlType.RightBumper);
+		playerActions.NextWeapon.AddDefaultBinding (InputControlType.Action2);
 
 		playerActions.PreviousWeapon.AddDefaultBinding (Mouse.NegativeScrollWheel);
-		playerActions.PreviousWeapon.AddDefaultBinding (InputControlType.LeftBumper);
+		playerActions.PreviousWeapon.AddDefaultBinding (InputControlType.Action3);
 
 		playerActions.LookLeft.AddDefaultBinding (Mouse.NegativeX);
 		playerActions.LookLeft.AddDefaultBinding (InputControlType.RightStickLeft);
@@ -331,8 +331,11 @@ public class PlayerController : MonoBehaviour
 			// Looking
 			if (UseKeyboardControls == false) 
 			{
-				PlayerRotation.transform.Rotate (Vector3.up * playerActions.Look.Value.x * Sensitivity.x);
-				PlayerRotation.transform.Rotate (Vector3.left * playerActions.Look.Value.y * Sensitivity.y);
+				Vector3 RotateVertical = Vector3.up * playerActions.Look.Value.x * Sensitivity.x * 1.5f;
+				Vector3 RotateHorizontal = Vector3.left * playerActions.Look.Value.y * Sensitivity.y * 1.5f;
+
+				PlayerRotation.transform.Rotate (RotateVertical);
+				PlayerRotation.transform.Rotate (RotateHorizontal);	
 			}
 
 			if (UseKeyboardControls == true) 
@@ -343,8 +346,6 @@ public class PlayerController : MonoBehaviour
 				PlayerRotation.transform.Rotate (RotateVertical);
 				PlayerRotation.transform.Rotate (RotateHorizontal);			
 			}
-
-			//rb.velocity += transform.forward * playerActions.Move.Value.y;
 		}
 
 		if (CurrentHealth <= 0) 
@@ -362,32 +363,12 @@ public class PlayerController : MonoBehaviour
 
 	void ClampVelocity ()
 	{
-		
-		// Clamps via velocity.
-		/*rb.velocity = new Vector3 (
-			Mathf.Clamp (rb.velocity.x, -MaxVelocity, MaxVelocity),
-			Mathf.Clamp (rb.velocity.y, -MaxVelocity, MaxVelocity), 
-			Mathf.Clamp (rb.velocity.z, -MaxVelocity, MaxVelocity)
-		);*/
-
 		rb.velocity = Vector3.ClampMagnitude (rb.velocity, MaxVelocity);
-
-		// Clamps with new method.
-
-		/*if (rb.velocity.sqrMagnitude > (MaxVelocity * MaxVelocity)) 
-		{
-			rb.velocity = rb.velocity.normalized * MaxVelocity;
-		}
-
-		if (rb.velocity.sqrMagnitude < 0) 
-		{
-			rb.velocity = rb.velocity.normalized;
-		}*/
 	}
 		
 	void Shoot ()
 	{
-		if (Overheated == false) 
+		if (Overheated == false && Died == false) 
 		{
 			if (Time.time > nextFire)
 			{
@@ -553,10 +534,7 @@ public class PlayerController : MonoBehaviour
 
 		MainPostProcess.chromaticAberration.settings = ChromaticAbberationSettings;
 
-		Camera.main.fieldOfView = Mathf.Clamp (0.2666666f * rb.velocity.magnitude + 50, 50, 90);
-		//Camera.main.fieldOfView = Mathf.Clamp (-0.5625f * rb.velocity.magnitude + 120, 30, 120);
-
-		//Debug.Log ("Current velocity magnitude = " + rb.velocity.magnitude);
+		Camera.main.fieldOfView = Mathf.Clamp (0.2666666f * transform.InverseTransformDirection (rb.velocity).z + 50, 50, 90);
 	}
 
 	void CheckHealthAmount ()
@@ -771,7 +749,9 @@ public class PlayerController : MonoBehaviour
 		{
 			if (TargetHealth > 0) 
 			{
-				TargetHealth -= transform.InverseTransformDirection (rb.velocity).magnitude * ObstacleDamage;
+				//TargetHealth -= transform.InverseTransformDirection (rb.velocity).magnitude * ObstacleDamage;
+				TargetHealth -= transform.InverseTransformDirection (rb.velocity).z * ObstacleDamage;
+
 				Instantiate (HitParticles, col.contacts [0].point, Quaternion.identity);
 
 				if (HitSound.isPlaying == false)
@@ -820,6 +800,7 @@ public class PlayerController : MonoBehaviour
 		rb.velocity = Vector3.zero;
 		rb.angularVelocity = Vector3.zero;
 		PlayerExplosion.Play ();
+		PlayerExplosionSound.Stop ();
 		PlayerExplosionSound.Play ();
 		SpeedOmeterImage.fillAmount = 0;
 		SpeedText.text = "" + 0;
@@ -834,14 +815,14 @@ public class PlayerController : MonoBehaviour
 	{
 		rb.velocity = Vector3.zero;
 		TauntTextString.text = Taunts [Random.Range (0, Taunts.Length)];
-		TauntText.Play ("TauntText");
 		LifeAnims [LivesLeft - 1].Play ("LifeExit");
+		MainUI.SetActive (false);
+		TauntText.Play ("TauntText");
 		yield return new WaitForSecondsRealtime (1);
 		CurrentHealth = 1;
 		LivesLeft -= 1;
-		yield return new WaitForSecondsRealtime (1);
+		yield return new WaitForSecondsRealtime (1.5f);
 		RespawnUI.SetActive (true);
-		MainUI.SetActive (false);
 	}
 
 	public void RespawnPlayerNow ()
@@ -869,7 +850,7 @@ public class PlayerController : MonoBehaviour
 	void CheckWeaponId ()
 	{
 		if (isPaused == false) {
-			if (playerActions.NextWeapon.Value > 0) {
+			if (playerActions.NextWeapon.WasPressed) {
 				WeaponId += 1;
 				WeaponWheel.Play ("WeaponWheelOn", -1, 0);
 
@@ -1032,7 +1013,7 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 
-			if (playerActions.PreviousWeapon.Value > 0) {
+			if (playerActions.PreviousWeapon.WasPressed) {
 				if (WeaponId > 0) {
 					WeaponId -= 1;
 					WeaponWheel.Play ("WeaponWheelOn", -1, 0);

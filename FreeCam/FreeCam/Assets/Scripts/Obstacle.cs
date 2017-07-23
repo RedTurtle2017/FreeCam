@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour 
 {
-	//public AudioSource Soundtrack;
 	public AudioSourceLoudnessTester AudioLoudness;
 
 	public Vector2 ScaleMultRange;
@@ -25,11 +24,12 @@ public class Obstacle : MonoBehaviour
 
 	void Update () 
 	{
-		transform.localScale = new Vector3
-			(
-				Mathf.SmoothDamp (transform.localScale.x, Mathf.Clamp(ScaleMultiplier * -AudioLoudness.clipLoudness + AddScale, 10, 80), ref ScaleVel, ScaleSmoothing * Time.deltaTime),
-				Mathf.SmoothDamp (transform.localScale.y, Mathf.Clamp(ScaleMultiplier * -AudioLoudness.clipLoudness + AddScale, 10, 80), ref ScaleVel, ScaleSmoothing * Time.deltaTime),
-				Mathf.SmoothDamp (transform.localScale.z, Mathf.Clamp(ScaleMultiplier * -AudioLoudness.clipLoudness + AddScale, 10, 80), ref ScaleVel, ScaleSmoothing * Time.deltaTime)
+		if (Time.timeScale > 0) {
+			transform.localScale = new Vector3 (
+				Mathf.SmoothDamp (transform.localScale.x, Mathf.Clamp (ScaleMultiplier * -AudioLoudness.clipLoudness + AddScale, 10, 80), ref ScaleVel, ScaleSmoothing * Time.deltaTime),
+				Mathf.SmoothDamp (transform.localScale.y, Mathf.Clamp (ScaleMultiplier * -AudioLoudness.clipLoudness + AddScale, 10, 80), ref ScaleVel, ScaleSmoothing * Time.deltaTime),
+				Mathf.SmoothDamp (transform.localScale.z, Mathf.Clamp (ScaleMultiplier * -AudioLoudness.clipLoudness + AddScale, 10, 80), ref ScaleVel, ScaleSmoothing * Time.deltaTime)
 			);
+		}
 	}
 }
