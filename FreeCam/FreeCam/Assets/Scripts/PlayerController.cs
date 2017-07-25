@@ -119,6 +119,13 @@ public class PlayerController : MonoBehaviour
 	public float CooldownThreshold = 0.8f;
 	public ParticleSystem CooldownWarningParticles;
 
+	[Header ("Bounds")]
+	public bool isOutsideBounds;
+	public Collider Bounds;
+	public float BoundsDamage = 9;
+	public AudioSource BoundsDamageSound;
+	public Animator BoundsHurtUI;
+
 	[Header ("Death")]
 	public bool Died;
 	public GameObject MeshObject;
@@ -472,8 +479,6 @@ public class PlayerController : MonoBehaviour
 				Invoke ("ExplodePlayer", Random.Range (0.5f, 1));
 				Died = true;
 			}
-
-			TargetHighFreq = 0;
 		}
 
 		if (Died == true)
@@ -513,10 +518,10 @@ public class PlayerController : MonoBehaviour
 
 		if (Time.timeScale > 0.01f && SoundtrackBase.volume != 0.5f) 
 		{
-			SoundtrackBase.volume = 0.5f;
-			SoundtrackLayerOne.volume = 0.5f;
-			SoundtrackLayerTwo.volume = 0.5f;
-			SoundtrackLayerThree.volume = 0.5f;
+			SoundtrackBase.volume = 0.2f;
+			SoundtrackLayerOne.volume = 0.2f;
+			SoundtrackLayerTwo.volume = 0.2f;
+			SoundtrackLayerThree.volume = 0.2f;
 
 			Cursor.visible = false;
 			Cursor.lockState = CursorLockMode.Locked;
@@ -542,8 +547,11 @@ public class PlayerController : MonoBehaviour
 	{
 		CurrentHealth = Mathf.SmoothDamp (CurrentHealth, TargetHealth, ref HealthVel, HealthSmoothTime * Time.deltaTime);
 
+		// Clamps everything.
 		HealthSliderA.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
 		HealthSliderB.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
+		CurrentHealth = Mathf.Clamp (CurrentHealth, 0, 100);
+		TargetHealth = Mathf.Clamp (TargetHealth, 0, 100);
 	}
 
 	void CheckParticleEngines ()
@@ -744,14 +752,40 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	void HurtHealth ()
+	{
+		TargetHealth -= BoundsDamage;
+		// Do UI and sound cool stuff;
+		TargetHighFreq = 3600;
+	}
+
+	void OnTriggerEnter (Collider other)
+	{
+		if (other.tag == "Bounds") 
+		{
+			isOutsideBounds = false;
+			CancelInvoke ("HurtHealth");
+			TargetHighFreq = 0;
+		}
+	}
+
+	void OnTriggerExit (Collider other)
+	{
+		if (other.tag == "Bounds") 
+		{
+			isOutsideBounds = true;
+			InvokeRepeating ("HurtHealth", 0.5f, 1);
+		}
+	}
+
 	void OnCollisionEnter (Collision col)
 	{
 		if (col.collider.tag == "Obstacle") 
 		{
 			if (TargetHealth > 0) 
 			{
-				//TargetHealth -= transform.InverseTransformDirection (rb.velocity).magnitude * ObstacleDamage;
-				TargetHealth -= transform.InverseTransformDirection (rb.velocity).z * ObstacleDamage;
+				//TargetHealth -= transform.InverseTransformDirection (rb.velocity).z * ObstacleDamage;
+				TargetHealth -= rb.velocity.magnitude * ObstacleDamage;
 
 				Instantiate (HitParticles, col.contacts [0].point, Quaternion.identity);
 
@@ -760,6 +794,9 @@ public class PlayerController : MonoBehaviour
 					HitSound.Play ();
 					CamShakeScript.shakeTimeRemaining = CamShakeScript.shakeDuration;
 				}
+
+				TargetHighFreq = 3600;
+				Invoke ("RestoreHighPassFreq", 0.5f);
 			}
 
 			if (TargetHealth <= 0) 
@@ -780,6 +817,11 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	void RestoreHighPassFreq ()
+	{
+		TargetHighFreq = 0;
 	}
 
 	IEnumerator DeadTimeScaleSet ()
@@ -829,7 +871,7 @@ public class PlayerController : MonoBehaviour
 
 	public void RespawnPlayerNow ()
 	{
-		//GetComponent<ConstantForce> ().relativeForce = new Vector3 (0, 0, 400);
+		TargetHighFreq = 0;
 		rb.angularDrag = 2.0f;
 		rb.drag = 0.96f;
 		gameObject.transform.position = SpawnPoints [Random.Range (0, SpawnPoints.Length)].transform.position;
