@@ -143,6 +143,8 @@ public class PlayerController : MonoBehaviour
 
 	[Header ("Respawn")]
 	public GameObject[] SpawnPoints;
+	public Collider PlayerCollider;
+	public ParticleSystem RespawnParticles;
 
 	public PlayerActions playerActions;
 
@@ -286,7 +288,6 @@ public class PlayerController : MonoBehaviour
 		playerActions.LookUp.AddDefaultBinding (InputControlType.RightStickUp);
 
 		playerActions.Shoot.AddDefaultBinding (Mouse.LeftButton);
-		playerActions.Shoot.AddDefaultBinding (Key.LeftControl);
 		playerActions.Shoot.AddDefaultBinding (InputControlType.RightTrigger);
 
 		playerActions.Ability.AddDefaultBinding (Mouse.RightButton);
@@ -317,7 +318,7 @@ public class PlayerController : MonoBehaviour
 			(
 				Mathf.Clamp ((playerActions.Move.Value.x), -1, 1) * Force.x, 
 				playerActions.Elevate.Value * Force.y, 
-				playerActions.Move.Value.y * Force.z, ForceMode.Acceleration
+				playerActions.Move.Value.y * Force.z, ForceMode.Force
 			);
 
 			// Rolling
@@ -783,6 +784,7 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator DeadTimeScaleSet ()
 	{
+		PlayerCollider.enabled = false;
 		gameControllerScript.TargetTimeScale = DeadTimeScale;
 		yield return new WaitForSecondsRealtime (MaxDeadTime);
 		gameControllerScript.TargetTimeScale = 1;
@@ -821,13 +823,13 @@ public class PlayerController : MonoBehaviour
 		yield return new WaitForSecondsRealtime (1);
 		CurrentHealth = 1;
 		LivesLeft -= 1;
-		yield return new WaitForSecondsRealtime (1.5f);
+		yield return new WaitForSecondsRealtime (3f);
 		RespawnUI.SetActive (true);
 	}
 
 	public void RespawnPlayerNow ()
 	{
-		GetComponent<ConstantForce> ().relativeForce = new Vector3 (0, 0, 400);
+		//GetComponent<ConstantForce> ().relativeForce = new Vector3 (0, 0, 400);
 		rb.angularDrag = 2.0f;
 		rb.drag = 0.96f;
 		gameObject.transform.position = SpawnPoints [Random.Range (0, SpawnPoints.Length)].transform.position;
@@ -838,13 +840,16 @@ public class PlayerController : MonoBehaviour
 		MainUI.SetActive (true);
 		CameraPivotFollowScript.SMOOTH_TIME = 0.02f;
 		MeshObject.SetActive (true);
+		RespawnParticles.Play ();
 		StartCoroutine (EnableShooting ());
 	}
 
 	IEnumerator EnableShooting ()
 	{
-		yield return new WaitForSeconds (1);
+		yield return new WaitForSeconds (3);
+		PlayerCollider.enabled = true;
 		Died = false;
+		RespawnParticles.Stop (true, ParticleSystemStopBehavior.StopEmitting);
 	}
 
 	void CheckWeaponId ()
