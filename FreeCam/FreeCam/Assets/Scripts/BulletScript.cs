@@ -19,10 +19,6 @@ public class BulletScript : MonoBehaviour
 		rb.velocity = transform.forward * speed.z * Time.deltaTime;
 	}
 
-	void FixedUpdate ()
-	{
-	}
-
 	void OnCollisionEnter (Collision col)
 	{
 		rb.transform.rotation = Quaternion.LookRotation (rb.velocity);

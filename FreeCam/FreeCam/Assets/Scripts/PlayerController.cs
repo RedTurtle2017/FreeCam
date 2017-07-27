@@ -20,7 +20,10 @@ public class PlayerController : MonoBehaviour
 	public float HealthSmoothTime;
 	public Slider HealthSliderA;
 	public Slider HealthSliderB;
+	public Slider HealthSliderSmoothA;
+	public Slider HealthSliderSmoothB;
 	public ParticleSystem HitParticles;
+	public AudioSource LowHealthSound;
 
 	[Header ("Lives")]
 	public int LivesLeft = 3;
@@ -35,6 +38,7 @@ public class PlayerController : MonoBehaviour
 	public bool UseKeyboardControls = true;
 	public Rigidbody rb;
 	public float MaxVelocity = 100;
+	public float VelocityMagnitude;
 	public Vector3 Force;
 	public Transform CameraPivot;
 	public Vector2 Sensitivity;
@@ -44,12 +48,15 @@ public class PlayerController : MonoBehaviour
 	public Transform PlayerRotation;
 	public Rigidbody PlayerRotationRb;
 	public Image SpeedOmeterImage;
+	public Image SpeedOmeterImageSmooth;
+	private float SpeedOmeterVel;
 	public TextMeshProUGUI SpeedText;
 	public CameraShake CamShakeScript;
 
 	[Header ("Engines")]
 	public float MaxEngineEmissionRate;
 	public ParticleSystem MainEngine;
+	public AudioSource MainEngineAudio;
 	public ParticleSystem EngineTopRearA;
 	public ParticleSystem EngineTopRearB;
 	public ParticleSystem EngineTopFrontA;
@@ -66,6 +73,7 @@ public class PlayerController : MonoBehaviour
 	public ParticleSystem EngineLeftSideRearB;
 	public ParticleSystem EngineLeftSideFrontA;
 	public ParticleSystem EngineLeftSideFrontB;
+
 
 	[Header ("Shooting")]
 	public GameObject Shot;
@@ -124,6 +132,7 @@ public class PlayerController : MonoBehaviour
 	public Collider Bounds;
 	public float BoundsDamage = 9;
 	public AudioSource BoundsDamageSound;
+
 	public Animator BoundsHurtUI;
 
 	[Header ("Death")]
@@ -323,9 +332,9 @@ public class PlayerController : MonoBehaviour
 			// Moving
 			rb.AddRelativeForce 
 			(
-				Mathf.Clamp ((playerActions.Move.Value.x), -1, 1) * Force.x, 
-				playerActions.Elevate.Value * Force.y, 
-				playerActions.Move.Value.y * Force.z, ForceMode.Force
+				Mathf.Clamp (playerActions.Move.Value.x, -1, 1) * Force.x, 
+				Mathf.Clamp (playerActions.Elevate.Value, -1, 1) * Force.y, 
+				Mathf.Clamp (playerActions.Move.Value.y, -1, 1) * Force.z, ForceMode.Force
 			);
 
 			// Rolling
@@ -370,8 +379,9 @@ public class PlayerController : MonoBehaviour
 	}
 
 	void ClampVelocity ()
-	{
+	{		
 		rb.velocity = Vector3.ClampMagnitude (rb.velocity, MaxVelocity);
+		VelocityMagnitude = rb.velocity.magnitude;
 	}
 		
 	void Shoot ()
@@ -457,6 +467,7 @@ public class PlayerController : MonoBehaviour
 		if (Died == false) 
 		{
 			SpeedOmeterImage.fillAmount = (rb.velocity.magnitude * 0.75f) / MaxVelocity;
+			SpeedOmeterImageSmooth.fillAmount = Mathf.SmoothDamp (SpeedOmeterImageSmooth.fillAmount, SpeedOmeterImage.fillAmount, ref SpeedOmeterVel, 16 * Time.deltaTime);
 			SpeedText.text = "" + Mathf.Round (rb.velocity.magnitude * 2);
 		}
 	}
@@ -485,6 +496,8 @@ public class PlayerController : MonoBehaviour
 		{
 			TargetHighFreq = 2500;
 		}
+
+		MainEngineAudio.volume = (rb.velocity.magnitude * 0.25f) / MaxVelocity;
 	}
 
 	void CheckPauseState ()
@@ -548,10 +561,39 @@ public class PlayerController : MonoBehaviour
 		CurrentHealth = Mathf.SmoothDamp (CurrentHealth, TargetHealth, ref HealthVel, HealthSmoothTime * Time.deltaTime);
 
 		// Clamps everything.
-		HealthSliderA.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
-		HealthSliderB.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
+		HealthSliderA.value = Mathf.Clamp (TargetHealth, 0, StartingHealth);
+		HealthSliderB.value = Mathf.Clamp (TargetHealth, 0, StartingHealth);
+		HealthSliderSmoothA.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
+		HealthSliderSmoothB.value = Mathf.Clamp (CurrentHealth, 0, StartingHealth);
 		CurrentHealth = Mathf.Clamp (CurrentHealth, 0, 100);
 		TargetHealth = Mathf.Clamp (TargetHealth, 0, 100);
+
+		if (TargetHealth < 25 && TargetHealth > 0) 
+		{
+			if (BoundsHurtUI.GetCurrentAnimatorStateInfo (0).IsName ("RedVignettePulse") == false) 
+			{
+				BoundsHurtUI.Play ("RedVignettePulse");
+			}
+
+			if (LowHealthSound.isPlaying == false) 
+			{
+				LowHealthSound.Play ();
+				LowHealthSound.volume = 0.3f;
+			}
+		}
+
+		if (TargetHealth >= 25) 
+		{
+			if (BoundsHurtUI.GetCurrentAnimatorStateInfo (0).IsName ("RedVignettePulse") == true) 
+			{
+				BoundsHurtUI.StopPlayback ();
+			}
+
+			if (LowHealthSound.isPlaying == true) 
+			{
+				LowHealthSound.Stop ();
+			}
+		}
 	}
 
 	void CheckParticleEngines ()
@@ -757,6 +799,7 @@ public class PlayerController : MonoBehaviour
 		TargetHealth -= BoundsDamage;
 		// Do UI and sound cool stuff;
 		TargetHighFreq = 3600;
+		BoundsHurtUI.Play ("RedVignettePulseOnce");
 	}
 
 	void OnTriggerEnter (Collider other)
@@ -786,12 +829,14 @@ public class PlayerController : MonoBehaviour
 			{
 				//TargetHealth -= transform.InverseTransformDirection (rb.velocity).z * ObstacleDamage;
 				TargetHealth -= rb.velocity.magnitude * ObstacleDamage;
+				//rb.velocity = Vector3.zero;
 
 				Instantiate (HitParticles, col.contacts [0].point, Quaternion.identity);
 
 				if (HitSound.isPlaying == false)
 				{
 					HitSound.Play ();
+					HitSound.pitch = rb.velocity.magnitude / MaxVelocity;
 					CamShakeScript.shakeTimeRemaining = CamShakeScript.shakeDuration;
 				}
 
@@ -828,8 +873,12 @@ public class PlayerController : MonoBehaviour
 	{
 		PlayerCollider.enabled = false;
 		gameControllerScript.TargetTimeScale = DeadTimeScale;
+		LowHealthSound.pitch = 1.5f;
+		LowHealthSound.volume = 0.5f;
 		yield return new WaitForSecondsRealtime (MaxDeadTime);
 		gameControllerScript.TargetTimeScale = 1;
+		LowHealthSound.volume = 0;
+		LowHealthSound.Stop ();
 	}
 
 	void SetStartLives ()
@@ -848,6 +897,7 @@ public class PlayerController : MonoBehaviour
 		PlayerExplosionSound.Play ();
 		SpeedOmeterImage.fillAmount = 0;
 		SpeedText.text = "" + 0;
+		LowHealthSound.pitch = 1f;
 
 		if (LivesLeft > 0) 
 		{
@@ -888,10 +938,12 @@ public class PlayerController : MonoBehaviour
 
 	IEnumerator EnableShooting ()
 	{
+		TargetHighFreq = 0;
 		yield return new WaitForSeconds (3);
 		PlayerCollider.enabled = true;
 		Died = false;
 		RespawnParticles.Stop (true, ParticleSystemStopBehavior.StopEmitting);
+		TargetHighFreq = 0;
 	}
 
 	void CheckWeaponId ()
