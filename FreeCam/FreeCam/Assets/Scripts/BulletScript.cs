@@ -16,7 +16,7 @@ public class BulletScript : MonoBehaviour
 		Invoke ("EnableBulletCol", BulletColDelay);
 		playerRb = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody> ();
 		rb = GetComponent<Rigidbody> ();
-		rb.velocity = transform.forward * speed.z * Time.deltaTime;
+		//rb.velocity = transform.forward * speed.z * Time.deltaTime;
 	}
 
 	void OnCollisionEnter (Collision col)

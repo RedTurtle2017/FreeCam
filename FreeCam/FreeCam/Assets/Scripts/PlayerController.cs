@@ -74,16 +74,19 @@ public class PlayerController : MonoBehaviour
 	public ParticleSystem EngineLeftSideFrontA;
 	public ParticleSystem EngineLeftSideFrontB;
 
-
 	[Header ("Shooting")]
 	public GameObject Shot;
 	public Transform ShotSpawnL;
+	public Transform ShotSpawnM;
 	public Transform ShotSpawnR;
 	public bool usePrimaryBarrel;
 	public bool Overheated;
 
 	public int WeaponId;
 	public int MaxWeapons = 8;
+
+	public GameObject[] Weapon;
+
 	public bool canUseWeapon1;
 	public bool canUseWeapon2;
 	public bool canUseWeapon3;
@@ -115,6 +118,7 @@ public class PlayerController : MonoBehaviour
 
 	public float FireRate;
 	private float nextFire;
+	public GameObject CrosshairObject;
 
 	public AudioSource HitSound;
 
@@ -156,11 +160,14 @@ public class PlayerController : MonoBehaviour
 	public GameObject MainUI;
 
 	public Animator[] LifeAnims;
+	public float DeathTimerDuration = 10.0f;
+	public float DeathTimerRemaining;
 
 	[Header ("Respawn")]
 	public GameObject[] SpawnPoints;
 	public Collider PlayerCollider;
 	public ParticleSystem RespawnParticles;
+	public TextMeshProUGUI TimedRespawn;
 
 	public PlayerActions playerActions;
 
@@ -218,7 +225,7 @@ public class PlayerController : MonoBehaviour
 						Shoot ();
 					}
 
-					if (CurrentHealth <= 0) 
+					if (DeathTimerRemaining > 0) 
 					{
 						if (RespawnUI.activeSelf == true) 
 						{
@@ -323,11 +330,15 @@ public class PlayerController : MonoBehaviour
 	{
 		CurrentHealth = 1;
 		TargetHealth = StartingHealth;
+		HealthSliderA.value = 0;
+		HealthSliderB.value = 0;
+		HealthSliderSmoothA.value = 0;
+		HealthSliderSmoothB.value = 0;
 	}
 
 	void MovePlayer ()
 	{
-		if (CurrentHealth > 0)
+		if (CurrentHealth > 0 && TargetHealth > 0)
 		{
 			// Moving
 			rb.AddRelativeForce 
@@ -403,6 +414,11 @@ public class PlayerController : MonoBehaviour
 					{
 						Instantiate (Shot, ShotSpawnR.position, ShotSpawnR.rotation);
 					}
+				}
+
+				if (WeaponId == 2) 
+				{
+					Instantiate (Shot, ShotSpawnM.position, ShotSpawnM.rotation);
 				}
 
 				if (CoolDownImage.fillAmount < 0.99f) 
@@ -592,6 +608,20 @@ public class PlayerController : MonoBehaviour
 			if (LowHealthSound.isPlaying == true) 
 			{
 				LowHealthSound.Stop ();
+			}
+		}
+
+		if (RespawnUI.activeSelf == true) 
+		{
+			if (DeathTimerRemaining > 0) 
+			{
+				DeathTimerRemaining -= Time.deltaTime;
+				TimedRespawn.text = "Respawning in " + Mathf.RoundToInt (DeathTimerRemaining) + "...";
+			}
+
+			if (DeathTimerRemaining <= 0) 
+			{
+				RespawnPlayerNow ();
 			}
 		}
 	}
@@ -832,13 +862,9 @@ public class PlayerController : MonoBehaviour
 				//rb.velocity = Vector3.zero;
 
 				Instantiate (HitParticles, col.contacts [0].point, Quaternion.identity);
-
-				if (HitSound.isPlaying == false)
-				{
-					HitSound.Play ();
-					HitSound.pitch = rb.velocity.magnitude / MaxVelocity;
-					CamShakeScript.shakeTimeRemaining = CamShakeScript.shakeDuration;
-				}
+				HitSound.Play ();
+				HitSound.pitch = rb.velocity.magnitude / MaxVelocity;
+				CamShakeScript.shakeTimeRemaining = CamShakeScript.shakeDuration;
 
 				TargetHighFreq = 3600;
 				Invoke ("RestoreHighPassFreq", 0.5f);
@@ -846,12 +872,11 @@ public class PlayerController : MonoBehaviour
 
 			if (TargetHealth <= 0) 
 			{
-				rb.AddRelativeTorque (
-					new Vector3 (
-						Random.Range (-50, 50),
-						Random.Range (-10, 10),
-						Random.Range (-250, 250)
-						), 
+				rb.AddRelativeTorque ( new Vector3 (
+					Random.Range (-50, 50),
+					Random.Range (-10, 10),
+					Random.Range (-250, 250)
+					), 
 					ForceMode.VelocityChange);
 
 				StartCoroutine (DeadTimeScaleSet ());
@@ -874,7 +899,7 @@ public class PlayerController : MonoBehaviour
 		PlayerCollider.enabled = false;
 		gameControllerScript.TargetTimeScale = DeadTimeScale;
 		LowHealthSound.pitch = 1.5f;
-		LowHealthSound.volume = 0.5f;
+		LowHealthSound.volume = 0.3f;
 		yield return new WaitForSecondsRealtime (MaxDeadTime);
 		gameControllerScript.TargetTimeScale = 1;
 		LowHealthSound.volume = 0;
@@ -888,6 +913,8 @@ public class PlayerController : MonoBehaviour
 
 	void ExplodePlayer ()
 	{
+		CrosshairObject.SetActive (false);
+		Died = true;
 		MeshObject.SetActive (false);
 		GetComponent<ConstantForce> ().relativeForce = Vector3.zero;
 		rb.velocity = Vector3.zero;
@@ -899,7 +926,7 @@ public class PlayerController : MonoBehaviour
 		SpeedText.text = "" + 0;
 		LowHealthSound.pitch = 1f;
 
-		if (LivesLeft > 0) 
+		if (LivesLeft != 0) 
 		{
 			StartCoroutine (RespawnPlayer ());
 		}
@@ -909,14 +936,15 @@ public class PlayerController : MonoBehaviour
 	{
 		rb.velocity = Vector3.zero;
 		TauntTextString.text = Taunts [Random.Range (0, Taunts.Length)];
-		LifeAnims [LivesLeft - 1].Play ("LifeExit");
+		//LifeAnims [LivesLeft - 1].Play ("LifeExit");
 		MainUI.SetActive (false);
 		TauntText.Play ("TauntText");
 		yield return new WaitForSecondsRealtime (1);
 		CurrentHealth = 1;
-		LivesLeft -= 1;
+		//LivesLeft -= 1;
 		yield return new WaitForSecondsRealtime (3f);
 		RespawnUI.SetActive (true);
+		DeathTimerRemaining = DeathTimerDuration;
 	}
 
 	public void RespawnPlayerNow ()
@@ -944,14 +972,20 @@ public class PlayerController : MonoBehaviour
 		Died = false;
 		RespawnParticles.Stop (true, ParticleSystemStopBehavior.StopEmitting);
 		TargetHighFreq = 0;
+		CrosshairObject.SetActive (true);
 	}
 
 	void CheckWeaponId ()
 	{
-		if (isPaused == false) {
-			if (playerActions.NextWeapon.WasPressed) {
+		if (isPaused == false)
+		{
+
+
+			if (playerActions.NextWeapon.WasPressed) 
+			{
 				WeaponId += 1;
 				WeaponWheel.Play ("WeaponWheelOn", -1, 0);
+				Shot = Weapon [WeaponId - 1];
 
 				if (canUseWeapon1 == false) {
 					WeaponIcon1.SetActive (false);
@@ -1112,15 +1146,20 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 
-			if (playerActions.PreviousWeapon.WasPressed) {
-				if (WeaponId > 0) {
+			if (playerActions.PreviousWeapon.WasPressed) 
+			{
+				if (WeaponId > 0) 
+				{
 					WeaponId -= 1;
 					WeaponWheel.Play ("WeaponWheelOn", -1, 0);
 				}
 
-				if (WeaponId <= 0) {
+				if (WeaponId <= 0)
+				{
 					WeaponId = MaxWeapons;
 				}
+
+				Shot = Weapon [WeaponId - 1];
 
 				if (canUseWeapon1 == false) {
 					WeaponIcon1.SetActive (false);
