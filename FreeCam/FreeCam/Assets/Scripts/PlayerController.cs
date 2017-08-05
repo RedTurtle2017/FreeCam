@@ -116,7 +116,17 @@ public class PlayerController : MonoBehaviour
 
 	public Animator WeaponWheel;
 
-	public float FireRate;
+	public float CurrentFireRate = 0.125f;
+
+	public float FireRateWeapon1 = 0.125f;
+	public float FireRateWeapon2;
+	public float FireRateWeapon3;
+	public float FireRateWeapon4;
+	public float FireRateWeapon5;
+	public float FireRateWeapon6;
+	public float FireRateWeapon7;
+	public float FireRateWeapon8;
+
 	private float nextFire;
 	public GameObject CrosshairObject;
 
@@ -341,12 +351,15 @@ public class PlayerController : MonoBehaviour
 		if (CurrentHealth > 0 && TargetHealth > 0)
 		{
 			// Moving
-			rb.AddRelativeForce 
+			if (rb.velocity.magnitude < (0.7567f * MaxVelocity))
+			{
+				rb.AddRelativeForce 
 			(
-				Mathf.Clamp (playerActions.Move.Value.x, -1, 1) * Force.x, 
-				Mathf.Clamp (playerActions.Elevate.Value, -1, 1) * Force.y, 
-				Mathf.Clamp (playerActions.Move.Value.y, -1, 1) * Force.z, ForceMode.Force
-			);
+					Mathf.Clamp (playerActions.Move.Value.x, -1, 1) * Force.x, 
+					Mathf.Clamp (playerActions.Elevate.Value, -1, 1) * Force.y, 
+					Mathf.Clamp (playerActions.Move.Value.y, -1, 1) * Force.z, ForceMode.Force
+				);
+			}
 
 			// Rolling
 			PlayerRotationRb.AddRelativeTorque
@@ -424,12 +437,12 @@ public class PlayerController : MonoBehaviour
 				if (CoolDownImage.fillAmount < 0.99f) 
 				{
 					CooldownTime += 0.5f * AddCooldownTime [WeaponId - 1];
-					nextFire = Time.time + FireRate;
+					nextFire = Time.time + CurrentFireRate;
 				}
 
 				if (CoolDownImage.fillAmount > 0.99f) 
 				{
-					nextFire = Time.time + FireRate * 2;
+					nextFire = Time.time + CurrentFireRate * 2;
 					Overheated = true;
 				}
 			}
@@ -1065,6 +1078,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon1;
 					break;
 
 				case 2:
@@ -1076,6 +1090,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon2;
 					break;
 
 				case 3:
@@ -1087,6 +1102,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon3;
 					break;
 
 				case 4:
@@ -1098,6 +1114,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon4;
 					break;
 
 				case 5:
@@ -1109,6 +1126,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon5;
 					break;
 
 				case 6:
@@ -1120,6 +1138,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = Color.white;
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon6;
 					break;
 
 				case 7:
@@ -1131,6 +1150,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = Color.white;
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon7;
 					break;
 
 				case 8:
@@ -1142,6 +1162,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = Color.white;
+					CurrentFireRate = FireRateWeapon8;
 					break;
 				}
 			}
@@ -1235,6 +1256,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon1;
 					break;
 
 				case 2:
@@ -1246,6 +1268,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon2;
 					break;
 
 				case 3:
@@ -1257,6 +1280,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon3;
 					break;
 
 				case 4:
@@ -1268,6 +1292,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon4;
 					break;
 
 				case 5:
@@ -1279,6 +1304,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon5;
 					break;
 
 				case 6:
@@ -1290,6 +1316,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = Color.white;
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon6;
 					break;
 
 				case 7:
@@ -1301,6 +1328,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = Color.white;
 					WeaponWheelIcon8.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+					CurrentFireRate = FireRateWeapon7;
 					break;
 
 				case 8:
@@ -1312,6 +1340,7 @@ public class PlayerController : MonoBehaviour
 					WeaponWheelIcon6.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon7.color = new Color (0.5f, 0.5f, 0.5f, 0.5f);
 					WeaponWheelIcon8.color = Color.white;
+					CurrentFireRate = FireRateWeapon8;
 					break;
 				}
 			}
