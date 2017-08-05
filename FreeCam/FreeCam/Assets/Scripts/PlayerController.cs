@@ -6,6 +6,7 @@ using InControl;
 using UnityEngine.UI;
 using UnityEngine.Audio;
 using UnityEngine.PostProcessing;
+using UnityStandardAssets.Utility;
 
 public class PlayerController : MonoBehaviour
 {
@@ -194,75 +195,111 @@ public class PlayerController : MonoBehaviour
 	[Header ("Misc")]
 	public bool isMenuPlayer;
 
+	[Header ("AI")]
+	public bool isAI;
+	public bool LocatedPlayer;
+	public float PlayersCheckingFrequency;
+	public float PlayersCheckingRange;
+	public float MinSpeed;
+	public float LookSpeed = 1;
+	public GameObject PlayerOne;
+
 	void Start () 
 	{
-		CreateBindings ();
-	
-		if (isMenuPlayer == false) 
+		if (isAI == false)
 		{
-			SetStartCursorState ();
-			SetStartHealth ();
-			SetStartLives ();
-			CameraPivotFollowScript.target = gameObject.transform;
+			CreateBindings ();
+	
+			if (isMenuPlayer == false)
+			{
+				SetStartCursorState ();
+				SetStartHealth ();
+				SetStartLives ();
+				CameraPivotFollowScript.target = gameObject.transform;
+			}
+		}
+
+		if (isAI == true) 
+		{
+			InvokeRepeating ("FindPlayers", 3, PlayersCheckingFrequency);
 		}
 	}
 
 	void Update ()
 	{
-		if (isMenuPlayer == false)
+		if (isAI == false)
 		{
-			CheckPauseState ();
-			CheckHealthAmount ();
-			CheckParticleEngines ();
-			CheckWeaponId ();
-			CheckSpeed ();
-			CheckAudio ();
-			CheckCooldown ();
-			CheckVisuals ();
+			if (isMenuPlayer == false) 
+			{
+				CheckPauseState ();
+				CheckHealthAmount ();
+				CheckParticleEngines ();
+				CheckWeaponId ();
+				CheckSpeed ();
+				CheckAudio ();
+				CheckCooldown ();
+				CheckVisuals ();
+			}
+		}
+
+		if (isAI == true) 
+		{
+			if (LocatedPlayer == true) 
+			{
+				HuntDownLocatedPlayer ();
+			}
+
+			if (LocatedPlayer == false) 
+			{
+				
+			}
 		}
 	}
 
 	void FixedUpdate () 
 	{
-		if (isMenuPlayer == false)
+		if (isAI == false)
 		{
-			if (isPaused == false)
+			if (isMenuPlayer == false)
 			{
-				if (playerActions.Shoot.Value > 0.1f) 
+				if (isPaused == false)
 				{
-					if (CurrentHealth > 0) 
+					if (playerActions.Shoot.Value > 0.1f) 
 					{
-						Shoot ();
-					}
-
-					if (DeathTimerRemaining > 0) 
-					{
-						if (RespawnUI.activeSelf == true) 
+						if (CurrentHealth > 0)
 						{
-							RespawnPlayerNow ();
+							Shoot ();
+						}
+
+						if (DeathTimerRemaining > 0) 
+						{
+							if (RespawnUI.activeSelf == true) 
+							{
+								RespawnPlayerNow ();
+							}
 						}
 					}
-				}
 
-				if (Overheated == false) 
-				{
-					
-				}
-
-				if (Overheated == true)
-				{
-					CooldownTime -= AddCooldownTime [WeaponId - 1] * Time.deltaTime;
-
-					if (CoolDownImage.fillAmount < 0.75f)
+					if (Overheated == false) 
 					{
-						Overheated = false;
+					
 					}
+
+					if (Overheated == true)
+					{
+						CooldownTime -= AddCooldownTime [WeaponId - 1] * Time.deltaTime;
+
+						if (CoolDownImage.fillAmount < 0.75f) 
+						{
+							Overheated = false;
+						}
+					}
+
+					MovePlayer ();
 				}
 
-				MovePlayer ();
+				ClampVelocity ();
 			}
-
-			ClampVelocity ();
 		}
 	}
 
@@ -416,6 +453,8 @@ public class PlayerController : MonoBehaviour
 			{
 				if (WeaponId == 1) 
 				{
+					Shot = Weapon [0];
+					CurrentFireRate = FireRateWeapon1;
 					usePrimaryBarrel = !usePrimaryBarrel;
 
 					if (usePrimaryBarrel)
@@ -431,6 +470,8 @@ public class PlayerController : MonoBehaviour
 
 				if (WeaponId == 2) 
 				{
+					Shot = Weapon [1];
+					CurrentFireRate = FireRateWeapon2;
 					Instantiate (Shot, ShotSpawnM.position, ShotSpawnM.rotation);
 				}
 
@@ -866,6 +907,44 @@ public class PlayerController : MonoBehaviour
 
 	void OnCollisionEnter (Collision col)
 	{
+		if (col.collider.tag == "Bullet") 
+		{
+			if (TargetHealth > 0) 
+			{
+				TargetHealth -= col.collider.GetComponent<BulletScript>().damage;
+
+				Instantiate (HitParticles, col.contacts [0].point, Quaternion.identity);
+				HitSound.Play ();
+				HitSound.pitch = Random.Range (0.75f, 1.25f);
+				CamShakeScript.shakeTimeRemaining = CamShakeScript.shakeDuration;
+
+				TargetHighFreq = 3600;
+				Invoke ("RestoreHighPassFreq", 0.5f);
+			}
+
+			if (TargetHealth <= 0) 
+			{
+				rb.AddRelativeTorque ( new Vector3 (
+					Random.Range (-50, 50),
+					Random.Range (-10, 10),
+					Random.Range (-250, 250)
+				), 
+					ForceMode.VelocityChange);
+
+				StartCoroutine (DeadTimeScaleSet ());
+
+				if (HitSound.isPlaying == false)
+				{
+					HitSound.Play ();
+				}
+
+				if (isAI == true) 
+				{
+					Destroy (gameObject);
+				}
+			}
+		}
+
 		if (col.collider.tag == "Obstacle") 
 		{
 			if (TargetHealth > 0) 
@@ -992,8 +1071,6 @@ public class PlayerController : MonoBehaviour
 	{
 		if (isPaused == false)
 		{
-
-
 			if (playerActions.NextWeapon.WasPressed) 
 			{
 				WeaponId += 1;
@@ -1344,6 +1421,31 @@ public class PlayerController : MonoBehaviour
 					break;
 				}
 			}
+		}
+	}
+
+	// For AI only
+	void FindPlayers ()
+	{
+		if (Vector3.Distance (PlayerOne.transform.position, transform.position) < PlayersCheckingRange)
+		{
+			MinSpeed = 30;
+			LocatedPlayer = true;
+		} else 
+		{
+			MinSpeed = 15;
+			LocatedPlayer = false;
+		}
+	}
+
+	void HuntDownLocatedPlayer ()
+	{
+		if (isPaused == false) 
+		{
+			var targetRotation = Quaternion.LookRotation (PlayerOne.transform.position - transform.position);
+			transform.rotation = Quaternion.RotateTowards (transform.rotation, targetRotation, 5);
+			GetComponent<AutoMoveAndRotate> ().moveUnitsPerSecond.value = new Vector3 (0, 0, MinSpeed);
+			Shoot ();
 		}
 	}
 }

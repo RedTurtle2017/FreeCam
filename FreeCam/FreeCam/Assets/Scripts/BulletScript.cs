@@ -10,6 +10,7 @@ public class BulletScript : MonoBehaviour
 	public float BumperForce;
 	public Collider BulletCol;
 	public float BulletColDelay = 0.1f;
+	public float damage;
 
 	void Awake ()
 	{
