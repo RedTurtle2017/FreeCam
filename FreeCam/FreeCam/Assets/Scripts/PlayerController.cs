@@ -203,6 +203,12 @@ public class PlayerController : MonoBehaviour
 	public float MinSpeed;
 	public float LookSpeed = 1;
 	public GameObject PlayerOne;
+	public Renderer PlayerAiOne;
+	public Renderer PlayerAiTwo;
+	public Transform NearCrosshair;
+	public AudioSource LockOnSound;
+	public AudioSource LostLockOnSound;
+	public bool lockedOn;
 
 	void Start () 
 	{
@@ -239,6 +245,68 @@ public class PlayerController : MonoBehaviour
 				CheckAudio ();
 				CheckCooldown ();
 				CheckVisuals ();
+					
+				if (Vector3.Distance (transform.position, PlayerAiOne.transform.position) < 200)
+				{
+					if (PlayerAiOne.gameObject.activeInHierarchy == true) 
+					{
+						NearCrosshair.position = PlayerAiOne.transform.position;
+
+						if (lockedOn == false) 
+						{
+							LockOnSound.Play ();
+							lockedOn = true;
+						}
+					}
+
+					if (PlayerAiOne.gameObject.activeInHierarchy == false) 
+					{
+						NearCrosshair.transform.localPosition = Vector3.zero;
+
+						if (lockedOn == true) 
+						{
+							LostLockOnSound.Play ();
+							lockedOn = false;
+						}
+					}
+				}
+
+				if (Vector3.Distance (transform.position, PlayerAiTwo.transform.position) < 200) 
+				{
+					if (PlayerAiTwo.gameObject.activeInHierarchy == true) 
+					{
+						NearCrosshair.transform.position = PlayerAiTwo.transform.position;
+
+						if (lockedOn == false)
+						{
+							LockOnSound.Play ();
+							lockedOn = true;
+						}
+					}
+
+					if (PlayerAiTwo.gameObject.activeInHierarchy == false) 
+					{
+						NearCrosshair.transform.localPosition = Vector3.zero;
+
+						if (lockedOn == true) 
+						{
+							LostLockOnSound.Play ();
+							lockedOn = false;
+						}
+					}
+				}
+
+				if ((Vector3.Distance (transform.position, PlayerAiOne.transform.position) >= 200 &&
+					Vector3.Distance (transform.position, PlayerAiTwo.transform.position) >= 200)) 
+				{
+					NearCrosshair.transform.localPosition = Vector3.zero;
+
+					if (lockedOn == true) 
+					{
+						LostLockOnSound.Play ();
+						lockedOn = false;
+					}
+				}
 			}
 		}
 
@@ -924,14 +992,17 @@ public class PlayerController : MonoBehaviour
 
 			if (TargetHealth <= 0) 
 			{
-				rb.AddRelativeTorque ( new Vector3 (
-					Random.Range (-50, 50),
-					Random.Range (-10, 10),
-					Random.Range (-250, 250)
-				), 
-					ForceMode.VelocityChange);
+				if (isAI == false)
+				{
+					rb.AddRelativeTorque (new Vector3 (
+						Random.Range (-50, 50),
+						Random.Range (-10, 10),
+						Random.Range (-250, 250)
+					), 
+						ForceMode.VelocityChange);
 
-				StartCoroutine (DeadTimeScaleSet ());
+					StartCoroutine (DeadTimeScaleSet ());
+				}
 
 				if (HitSound.isPlaying == false)
 				{
@@ -940,7 +1011,16 @@ public class PlayerController : MonoBehaviour
 
 				if (isAI == true) 
 				{
-					Destroy (gameObject);
+					PlayerOne.GetComponent<PlayerController>().NearCrosshair.transform.localPosition = Vector3.zero;
+
+					if (PlayerOne.GetComponent<PlayerController>().lockedOn == true) 
+					{
+						PlayerOne.GetComponent<PlayerController>().LostLockOnSound.Play ();
+						PlayerOne.GetComponent<PlayerController>().lockedOn = false;
+					}
+
+					//Destroy (gameObject);
+					gameObject.SetActive (false);
 				}
 			}
 		}
@@ -1053,6 +1133,7 @@ public class PlayerController : MonoBehaviour
 		CameraPivotFollowScript.SMOOTH_TIME = 0.02f;
 		MeshObject.SetActive (true);
 		RespawnParticles.Play ();
+		CooldownTime = 0;
 		StartCoroutine (EnableShooting ());
 	}
 
@@ -1429,11 +1510,11 @@ public class PlayerController : MonoBehaviour
 	{
 		if (Vector3.Distance (PlayerOne.transform.position, transform.position) < PlayersCheckingRange)
 		{
-			MinSpeed = 30;
+			MinSpeed = 25;
 			LocatedPlayer = true;
 		} else 
 		{
-			MinSpeed = 15;
+			MinSpeed = 0;
 			LocatedPlayer = false;
 		}
 	}
